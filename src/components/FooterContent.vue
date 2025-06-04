@@ -1,6 +1,6 @@
 <template>
-  <div class="mx-auto px-16 py-4">
-    <footer class="layout-footer text-center p-8">
+  <div class="mx-auto px-16 pb-4 pt-8">
+    <footer class="bg-white/20 backdrop-blur-sm rounded-2xl  text-center p-8">
       <p class="layout-footer-title mb-4">
         &copy; 2024 iOS Club of XAUAT
       </p>
@@ -38,17 +38,6 @@
 </template>
 
 <style scoped>
-.layout-footer {
-  background: rgba(255, 255, 255, 0.3);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.3);
-  padding-left: 10px;
-  padding-right: 10px;
-
-  border-radius: 10px;
-}
-
 .layout-footer-title {
   color: #f3f5f7;
 }
@@ -66,5 +55,3 @@
   border-radius: .2em;
 }
 </style>
-<script setup lang="ts">
-</script>

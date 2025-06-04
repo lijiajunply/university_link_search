@@ -1,12 +1,15 @@
 <template>
-  <div class="" style="background-image: linear-gradient(to bottom right, #ff6b6b, #7171ae, #10bce7);">
+  <div class=""
+       style="background-image: linear-gradient(to bottom right, #ff6b6b, #7171ae, #10bce7); min-height: 100vh">
     <!-- 搜索栏 -->
     <SearchBar/>
 
     <!-- 网站分类卡片 -->
-    <div class="container mx-auto px-16 pt-36 pb-16">
+    <div class="container mx-auto px-16 pt-16">
       <div class="flex justify-center items-center">
-        <div class="grid grid-cols-8 gap-6 md:gap-8">
+        <div :class="[
+                'grid grid-cols-8 gap-6 md:gap-8 transition-opacity duration-1000 ease-in-out',
+                isVisible ? 'opacity-100' : 'opacity-0']">
           <div
               v-for="(category, index) in categories"
               :key="index"
@@ -29,13 +32,13 @@
               </template>
 
               <template #context>
-                <div class="grid grid-cols-12 gap-1 mb-2">
+                <div class="grid grid-cols-12 gap-x-1 gap-y-3 mb-2 mt-2">
                   <div
                       v-for="link in category.links"
                       :class="getLinkColClass(index)"
                   >
                     <a
-                        v-if="!isWeixin && link.description === '微信打开'"
+                        v-if="!isWeiXin && link.description === '微信打开'"
                         @click="qrCodeModalOpen(link)"
                         class="a-btn"
                         :title="link.description"
@@ -103,7 +106,11 @@
       </div>
     </div>
 
-    <Footer/>
+    <div :class="['transition-opacity duration-1000 ease-in-out',
+                isVisible ? 'opacity-100' : 'opacity-0']">
+      <FooterContent/>
+    </div>
+
   </div>
 
 </template>
@@ -118,8 +125,6 @@
   text-align: center;
   font-size: 0.8em;
 }
-
-
 </style>
 
 <script setup>
@@ -127,20 +132,25 @@ import AppleCard from './AppleCard.vue'
 import IconFont from './IconFont.vue'
 import SearchBar from "./components/SearchBar.vue";
 
-import {defineEmits, ref} from 'vue'
-import Footer from "./components/Footer.vue";
+import {defineEmits, onMounted, ref} from 'vue'
+import FooterContent from "./components/FooterContent.vue";
 
-const isWeixin = ref(false)
-
+const isWeiXin = ref(false)
+const isVisible = ref(false)
 const categories = ref([])
-
 const emit = defineEmits(['qr-code-modal-open'])
 
-const init = async () => {
-  categories.value = (await fetch('https://link.xauat.site/api/Link/GetCategory').then(res => res.json()))
-}
+onMounted(async () => {
+  // 组件挂载后触发浮现效果
+  setTimeout(() => {
+    isVisible.value = true
+  }, 100) // 短暂延迟以确保过渡效果正常
 
-init();
+  categories.value = await fetch('https://link.xauat.site/api/Link/GetCategory').then(res => res.json())
+
+  const ua = navigator.userAgent
+  isWeiXin.value = !!/MicroMessenger/i.test(ua)
+})
 
 const getCategoryColClass = (index) => {
   const isLastOdd = index === categories.value.length - 1 && categories.value.length % 2 !== 0
@@ -157,16 +167,18 @@ const getCategoryColClass = (index) => {
 const getLinkColClass = (categoryIndex) => {
   const isLastOdd = categoryIndex === categories.value.length - 1 && categories.value.length % 2 !== 0
 
+  let lgColClass = ''
+
   if (isLastOdd) {
-    return 'col-span-4 md:col-span-2 lg:col-span-1'
+    lgColClass = 'md:col-span-2 lg:col-span-1'
+  } else {
+    const i = categoryIndex % 4 === 1 || categoryIndex % 4 === 2 ? 15 : 9
+    const col = i === 15 ? 2 : 3
+
+    lgColClass = col === 2
+        ? 'md:col-span-4 lg:col-span-2'
+        : 'md:col-span-4 lg:col-span-3'
   }
-
-  const i = categoryIndex % 4 === 1 || categoryIndex % 4 === 2 ? 15 : 9
-  const col = i === 15 ? 2 : 3
-
-  const lgColClass = col === 2
-      ? 'md:col-span-4 lg:col-span-2'
-      : 'md:col-span-4 lg:col-span-3'
 
   return `col-span-4 ${lgColClass} `
 }

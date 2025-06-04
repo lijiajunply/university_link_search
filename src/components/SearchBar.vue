@@ -1,7 +1,7 @@
 <template>
   <div class="pt-12 pb-8">
     <div class="container mx-auto px-4">
-      <div class="flex items-center justify-center mt-32">
+      <div class="flex items-center justify-center mt-8">
         <div class="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center space-x-2">
           <h1 class="text-4xl font-bold text-white">
             {{time}}
@@ -9,7 +9,7 @@
         </div>
       </div>
 
-      <div class="max-w-2xl mx-auto mt-16">
+      <div class="max-w-2xl mx-auto mt-8">
         <div class="bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center px-4 py-3">
           <!-- 搜索引擎选择器 -->
           <div class="relative">
@@ -24,7 +24,7 @@
             </button>
 
             <!-- 搜索引擎下拉菜单 -->
-            <div v-if="showEngines" class="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg py-2 z-10">
+            <div v-if="showEngines" class="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg py-2 z-100">
               <button
                   v-for="engine in searchEngines"
                   :key="engine.id"
