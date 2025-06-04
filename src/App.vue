@@ -128,8 +128,8 @@
 </style>
 
 <script setup>
-import AppleCard from './AppleCard.vue'
-import IconFont from './IconFont.vue'
+import AppleCard from './components/AppleCard.vue'
+import IconFont from './components/IconFont.vue'
 import SearchBar from "./components/SearchBar.vue";
 
 import {defineEmits, onMounted, ref} from 'vue'
