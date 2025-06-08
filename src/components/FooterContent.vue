@@ -2,7 +2,7 @@
   <div class="mx-auto px-16 pb-4 pt-8">
     <footer class="bg-white/20 backdrop-blur-sm rounded-2xl  text-center p-8">
       <p class="layout-footer-title mb-4">
-        &copy; 2024 iOS Club of XAUAT
+        &copy; 2025 iOS Club of XAUAT
       </p>
       <div class="flex justify-center space-x-4">
         <div class="flex items-center space-x-2">
