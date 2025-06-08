@@ -1,8 +1,9 @@
 <template>
-  <div class=""
-       style="background-image: linear-gradient(to bottom right, #ff6b6b, #7171ae, #10bce7); min-height: 100vh">
+  <div v-on:click="hideMenu">
+    <div class="home-bg" :class="[isRightMenuVisible ? 'blur-sm' : 'blur-none']"></div>
+
     <!-- 搜索栏 -->
-    <SearchBar/>
+    <SearchBar :is-show-setting="isRightMenuVisible"/>
 
     <template v-if="categories.length > 0">
       <!-- 网站分类卡片 -->
@@ -121,7 +122,19 @@
 </template>
 
 <style scoped>
-
+.home-bg {
+  background-image: linear-gradient(to bottom right, #ff6b6b, #7171ae, #10bce7);
+  min-height: 100vh;
+  height: 100%;
+  left: 0;
+  -o-object-fit: cover;
+  object-fit: cover;
+  position: fixed;
+  top: 0;
+  transition: filter .25s, opacity 1s, transform .25s;
+  width: 100%;
+  z-index: -3;
+}
 
 .btn-description {
   color: #00000073;
@@ -135,7 +148,7 @@ import AppleCard from './components/AppleCard.vue'
 import IconFont from './components/IconFont.vue'
 import SearchBar from "./components/SearchBar.vue";
 
-import {onMounted, ref} from 'vue'
+import {onMounted, onUnmounted, ref} from 'vue'
 import FooterContent from "./components/FooterContent.vue";
 import QrCodeModal from "./components/QrCodeModal.vue";
 
@@ -144,17 +157,7 @@ const isVisible = ref(false)
 const categories = ref([])
 const showQrCodeModal = ref(false);
 const currentModalLink = ref(null);
-
-onMounted(async () => {
-  categories.value = await fetch('https://link.xauat.site/api/Link/GetCategory').then(res => res.json())
-// 组件挂载后触发浮现效果
-  setTimeout(() => {
-    isVisible.value = true
-  }, 100) // 短暂延迟以确保过渡效果正常
-
-  const ua = navigator.userAgent
-  isWeiXin.value = !!/MicroMessenger/i.test(ua)
-})
+const isRightMenuVisible = ref(false)
 
 const getCategoryColClass = (index) => {
   const isLastOdd = index === categories.value.length - 1 && categories.value.length % 2 !== 0
@@ -171,7 +174,7 @@ const getCategoryColClass = (index) => {
 const getLinkColClass = (categoryIndex) => {
   const isLastOdd = categoryIndex === categories.value.length - 1 && categories.value.length % 2 !== 0
 
-  let lgColClass = ''
+  let lgColClass
 
   if (isLastOdd) {
     lgColClass = 'md:col-span-2 lg:col-span-1'
@@ -200,4 +203,54 @@ const getIcon = (url) => {
   // 拼接形成 favicon URL
   return `https://${rootDomain}/favicon.ico`;
 }
+
+// 显示菜单
+const showMenu = (event) => {
+  event.preventDefault()
+  isRightMenuVisible.value = true
+}
+
+// 隐藏菜单
+const hideMenu = () => {
+  isRightMenuVisible.value = false
+}
+
+onMounted(async () => {
+
+  const handleKeydown = (event) => {
+    if (event.key === 'Escape') {
+      hideMenu()
+    }
+  }
+
+  const handleContextMenu = (event) => {
+    // 检查是否在输入框等元素上右键
+    const target = event.target
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      return // 允许默认右键菜单
+    }
+
+    showMenu(event)
+    console.log('右键菜单已显示')
+  }
+
+  document.addEventListener('keydown', handleKeydown)
+  document.addEventListener('contextmenu', handleContextMenu)
+
+
+  const ua = navigator.userAgent
+  isWeiXin.value = !!/MicroMessenger/i.test(ua)
+
+  categories.value = await fetch('https://link.xauat.site/api/Link/GetCategory').then(res => res.json())
+// 组件挂载后触发浮现效果
+  setTimeout(() => {
+    isVisible.value = true
+  }, 100) // 短暂延迟以确保过渡效果正常
+
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+  document.removeEventListener('contextmenu', handleContextMenu)
+})
 </script>
