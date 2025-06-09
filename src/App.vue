@@ -1,9 +1,9 @@
 <template>
-  <div v-on:click="hideMenu">
+  <div @click="hideMenu">
     <div class="home-bg" :class="[isRightMenuVisible ? 'blur-sm' : 'blur-none']"></div>
 
     <!-- 搜索栏 -->
-    <SearchBar :is-show-setting="isRightMenuVisible"/>
+    <SearchBar :is-show-setting="isRightMenuVisible" ref="searchRef"/>
 
     <template v-if="categories.length > 0">
       <!-- 网站分类卡片 -->
@@ -158,6 +158,7 @@ const categories = ref([])
 const showQrCodeModal = ref(false);
 const currentModalLink = ref(null);
 const isRightMenuVisible = ref(false)
+const searchRef = ref()
 
 const getCategoryColClass = (index) => {
   const isLastOdd = index === categories.value.length - 1 && categories.value.length % 2 !== 0
@@ -211,7 +212,14 @@ const showMenu = (event) => {
 }
 
 // 隐藏菜单
-const hideMenu = () => {
+const hideMenu = (event) => {
+  const target = event.target
+  if(target.id === 'setting' ){
+    event.preventDefault()
+    console.log('setting')
+    return;
+  }
+  if(searchRef.value.hide())return;
   isRightMenuVisible.value = false
 }
 
@@ -219,38 +227,36 @@ onMounted(async () => {
 
   const handleKeydown = (event) => {
     if (event.key === 'Escape') {
-      hideMenu()
+      hideMenu(event)
     }
   }
 
   const handleContextMenu = (event) => {
     // 检查是否在输入框等元素上右键
     const target = event.target
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable || target.id === 'chooseEngine') {
       return // 允许默认右键菜单
     }
 
     showMenu(event)
-    console.log('右键菜单已显示')
   }
 
   document.addEventListener('keydown', handleKeydown)
   document.addEventListener('contextmenu', handleContextMenu)
 
+  onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown)
+    document.removeEventListener('contextmenu', handleContextMenu)
+  })
 
   const ua = navigator.userAgent
   isWeiXin.value = !!/MicroMessenger/i.test(ua)
 
   categories.value = await fetch('https://link.xauat.site/api/Link/GetCategory').then(res => res.json())
-// 组件挂载后触发浮现效果
+
+  // 组件挂载后触发浮现效果
   setTimeout(() => {
     isVisible.value = true
   }, 100) // 短暂延迟以确保过渡效果正常
-
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-  document.removeEventListener('contextmenu', handleContextMenu)
 })
 </script>

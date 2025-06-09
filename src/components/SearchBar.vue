@@ -13,12 +13,38 @@
         </div>
         <div>
           <div class="flex justify-end" v-if="isShowSetting">
-            <button
-                @click=""
-                class="flex items-center space-x-2 px-3 py-1 rounded-full hover:bg-gray-100 transition-colors"
-            >
-              <span class="text-gray-500">设置</span>
-            </button>
+           <div class="relative">
+             <div
+                 @mouseenter="isOpenAccount = true"
+                 @mouseleave="isOpenAccount = false"
+                 class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
+             >
+               <AccountCircleOutlineIcon class="text-gray-600"/>
+             </div>
+             <div
+                 class="absolute top-full right-1 mt-2 py-2 z-50"
+                 v-show="isOpenAccount"
+                 @mouseenter="isOpenAccount = true"
+                 @mouseleave="isOpenAccount = false"
+             >
+              <AccountCard/>
+             </div>
+           </div>
+            <div class="relative">
+              <div
+                  @click="isOpenSetting = !isOpenSetting"
+                  id="setting"
+                  class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <CogIcon class="text-gray-600"/>
+              </div>
+              <div
+                  v-show="isOpenSetting && isShowSetting"
+                  class="absolute top-full right-1 mt-2 py-2 z-50"
+              >
+                <SettingCard/>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -26,9 +52,9 @@
       <div class="max-w-2xl mx-auto mt-8">
         <div class="bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center px-4 py-3">
           <!-- 搜索引擎选择器 -->
-          <div class="relative">
+          <div class="relative" id="chooseEngine">
             <button
-                @click="showEngines = !showEngines"
+                @click="engineClick"
                 class="flex items-center space-x-2 px-3 py-1 rounded-full hover:bg-gray-100 transition-colors"
             >
               <img :src="currentEngine.icon" :alt="currentEngine.name" class="w-5 h-5">
@@ -38,7 +64,8 @@
             </button>
 
             <!-- 搜索引擎下拉菜单 -->
-            <div v-if="showEngines" class="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg py-2 z-50">
+            <div :class="['absolute top-full left-0 mt-4 bg-white rounded-lg shadow-lg py-2 z-50',
+            firstShowEngines ? 'opacity-0' : showEngines ? 'fade-in-scale' : 'fade-out-scale']">
               <button
                   v-for="engine in searchEngines"
                   :key="engine.id"
@@ -52,13 +79,33 @@
           </div>
 
           <!-- 搜索输入框 -->
-          <input
-              v-model="searchQuery"
-              @keyup.enter="search"
-              type="text"
-              :placeholder="`在 ${currentEngine.name} 中搜索`"
-              class="flex-1 px-4 py-1 outline-none bg-transparent"
-          >
+          <div class="relative flex-1 px-4 py-1">
+            <input
+                v-model="searchQuery"
+                @keyup.enter="search"
+                @keyup="getSuggestions"
+                type="text"
+                :placeholder="`在 ${currentEngine.name} 中搜索`"
+                class="outline-none bg-transparent"
+            >
+            <div class="absolute left-0 mt-4 bg-white/70 backdrop-blur-sm rounded-lg shadow-lg z-40 "
+                 v-if="isOpenSuggestions">
+              <button
+                  @click="transform"
+                  class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 w-full text-left rounded-lg"
+              >
+                <span class="text-gray-700 text-sm">翻译: {{ searchQuery }}</span>
+              </button>
+              <button
+                  v-for="(suggestion, index) in suggestions"
+                  @click="openUrl(suggestion)"
+                  :class="{ 'bg-gray-100': index === selectedSuggestionIndex }"
+                  class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 w-full text-left rounded-lg"
+              >
+                <span class="text-gray-700 text-sm">{{ suggestion }}</span>
+              </button>
+            </div>
+          </div>
 
           <!-- 搜索按钮 -->
           <button
@@ -77,7 +124,7 @@
 
   <!-- 固定在顶部的左右格式版本 -->
   <div v-if="isSticky"
-       class="fixed top-0 left-0 right-0 bg-white/30 backdrop-blur-md shadow-md py-2 z-50 transition-all duration-300 transform translate-y-0">
+       class="fixed top-0 left-0 right-0 bg-white/30 backdrop-blur-sm shadow-md py-2 z-50 transition-all duration-300 transform translate-y-0">
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between">
         <!-- 左侧时间显示 -->
@@ -144,6 +191,10 @@
 
 <script setup>
 import {onMounted, onUnmounted, ref} from 'vue'
+import CogIcon from "vue-material-design-icons/Cog.vue";
+import AccountCircleOutlineIcon from "vue-material-design-icons/AccountCircleOutline.vue";
+import AccountCard from "./AccountCard.vue";
+import SettingCard from "./SettingCard.vue";
 
 defineProps({
   isShowSetting: {
@@ -151,10 +202,6 @@ defineProps({
     default: false
   }
 })
-
-const searchQuery = ref('')
-const showEngines = ref(false)
-const time = ref('')
 
 const searchEngines = [
   {
@@ -183,10 +230,18 @@ const searchEngines = [
   }
 ]
 
-// 新增的状态和引用
+const searchQuery = ref('')
+const showEngines = ref(false)
+const firstShowEngines = ref(true)
+const time = ref('')
+const suggestions = ref([])
+const selectedSuggestionIndex = ref(-1)
 const isSticky = ref(false);
 const originalNav = ref(null);
 const currentEngine = ref(searchEngines[0])
+const isOpenSuggestions = ref(false)
+const isOpenSetting = ref(false)
+const isOpenAccount  = ref(false)
 
 const updateTime = function () {
   const now = new Date();
@@ -203,10 +258,55 @@ const selectEngine = (engine) => {
   showEngines.value = false
 }
 
-const search = () => {
+const engineClick = () => {
+  showEngines.value = !showEngines.value;
+  firstShowEngines.value= false;
+}
+
+const search = async () => {
+  if (selectedSuggestionIndex.value !== -1) {
+    window.open(currentEngine.value.searchUrl + encodeURIComponent(suggestions.value[selectedSuggestionIndex.value]), '_blank')
+    searchQuery.value = ''
+    selectedSuggestionIndex.value = -1
+    return
+  }
+
   if (searchQuery.value.trim()) {
     window.open(currentEngine.value.searchUrl + encodeURIComponent(searchQuery.value), '_blank')
   }
+}
+
+const transform = () => {
+  if (searchQuery.value.trim()) {
+    window.open(`https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(searchQuery.value)}&op=translate`, '_blank')
+  }
+}
+
+const getSuggestions = async () => {
+  selectedSuggestionIndex.value = -1
+
+  if (searchQuery.value === '') {
+    isOpenSuggestions.value = false
+    suggestions.value = []
+    return
+  }
+  const result = await new Promise((resolve) => {
+    const callbackName = `jsonp_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+    window[callbackName] = (data) => {
+      resolve(data);
+      delete window[callbackName];
+      document.body.removeChild(script);
+    };
+    const script = document.createElement('script');
+    script.src = `https://suggestion.baidu.com/su?wd=${encodeURIComponent(searchQuery.value)}&cb=${callbackName}`;
+    document.body.appendChild(script);
+  });
+  suggestions.value = result.s
+  isOpenSuggestions.value = suggestions.value.length > 0
+}
+
+const openUrl = (text) => {
+  window.open(currentEngine.value.searchUrl + encodeURIComponent(text), '_blank')
 }
 
 // 滚动监听函数
@@ -217,6 +317,25 @@ const handleScroll = () => {
   // 当原始导航完全离开视口顶部时，激活固定导航
   isSticky.value = rect.bottom <= 0;
 };
+
+const hide = () => {
+  if(isOpenSetting.value){
+    console.log(isOpenSetting.value)
+    isOpenSetting.value = false
+    return true
+  }
+
+  if (showEngines.value) {
+    console.log(showEngines.value)
+    return true
+  }
+  if (isOpenSuggestions.value) {
+    isOpenSuggestions.value = false
+    console.log(isOpenSuggestions.value)
+    return true
+  }
+  return false
+}
 
 // 添加和移除滚动事件监听
 onMounted(() => {
@@ -229,4 +348,64 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
 });
+
+defineExpose({
+  name: 'hide',
+  hide
+})
 </script>
+
+<style scoped>
+.fade-in-scale {
+  transform-origin: left top;
+  animation: fade-in-scale 0.3s ease-in-out;
+  opacity: 1;
+}
+
+.fade-out-scale {
+  transform-origin: left top;
+  animation: fade-out-scale 0.3s ease-in-out;
+  opacity: 0;
+}
+
+@keyframes fade-in-scale {
+  0% {
+    opacity: 0;
+    transform: scale(.5)
+  }
+
+  48% {
+    opacity: 1;
+    transform: scale(1.03)
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1)
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: scale(.5)
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1)
+  }
+}
+
+@keyframes fade-out-scale {
+  0% {
+    opacity: 1;
+    transform: scale(1)
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(.5)
+  }
+}
+</style>
