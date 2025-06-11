@@ -115,8 +115,8 @@
   </div>
 
   <!-- 固定在顶部的左右格式版本 -->
-  <div v-if="isSticky"
-       class="fixed top-0 left-0 right-0 py-2 z-50 transition-all duration-300 transform translate-y-0 mx-8 my-4 rounded-lg liquid-card">
+  <div :class="firstSticky ? 'opacity-0' : isSticky ? 'liquid-card-in' : 'liquid-card-out'"
+       class="fixed top-0 left-0 right-0 py-2 z-50 transition-all duration-300 transform translate-y-0 mx-6 my-4 rounded-lg liquid-card">
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between">
         <!-- 左侧时间显示 -->
@@ -235,6 +235,7 @@ const searchEngines = [
 const searchQuery = ref('')
 const showEngines = ref(false)
 const firstShowEngines = ref(true)
+const firstSticky = ref(true)
 const time = ref('')
 const suggestions = ref([])
 const selectedSuggestionIndex = ref(-1)
@@ -318,6 +319,10 @@ const handleScroll = () => {
   const rect = originalNav.value.getBoundingClientRect();
   // 当原始导航完全离开视口顶部时，激活固定导航
   isSticky.value = rect.bottom <= 0;
+
+  if (isSticky.value && firstSticky.value) {
+    firstSticky.value = false
+  }
 };
 
 const hide = () => {
@@ -415,13 +420,21 @@ defineExpose({
   /* 玻璃效果 */
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(20px) saturate(180%);
-  box-shadow:
-      0 8px 32px rgba(31, 38, 135, 0.08),
-      inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.08),
+  inset 0 1px 2px rgba(255, 255, 255, 0.6);
 
   /* 悬停时的额外效果 */
   transition: all 0.3s ease;
+}
+
+.liquid-card-in {
   animation: fade-in-scale 0.5s ease-in-out;
+  opacity: 1;
+}
+
+.liquid-card-out {
+  animation: fade-out-scale 0.15s ease-in-out;
+  opacity: 0;
 }
 
 /* 确保内部元素的背景适配玻璃效果 */
