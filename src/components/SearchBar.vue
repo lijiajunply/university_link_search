@@ -56,7 +56,7 @@
             </button>
 
             <!-- 搜索引擎下拉菜单 -->
-            <div :class="['absolute top-full left-0 mt-4 bg-white rounded-lg shadow-lg py-2 z-50',
+            <div v-if="isShowEngines" :class="['absolute top-full left-0 mt-4 bg-white rounded-lg shadow-lg py-2 z-50',
             firstShowEngines ? 'opacity-0' : showEngines ? 'fade-in-scale' : 'fade-out-scale']">
               <button
                   v-for="engine in searchEngines"
@@ -132,7 +132,7 @@
             <!-- 搜索引擎选择器 -->
             <div class="relative">
               <button
-                  @click="showEngines = !showEngines"
+                  @click="engineClick"
                   class="flex items-center space-x-1 px-2 py-1 rounded-full hover:bg-gray-100 transition-colors"
               >
                 <img :src="currentEngine.icon" :alt="currentEngine.name" class="w-4 h-4">
@@ -142,7 +142,8 @@
               </button>
 
               <!-- 搜索引擎下拉菜单 -->
-              <div v-if="showEngines" class="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg py-2 z-50">
+              <div v-if="isShowEngines" :class="['absolute top-full left-0 mt-4 bg-white rounded-lg shadow-lg py-2 z-50',
+            firstShowEngines ? 'opacity-0' : showEngines ? 'fade-in-scale' : 'fade-out-scale']">
                 <button
                     v-for="engine in searchEngines"
                     :key="engine.id"
@@ -237,6 +238,7 @@ const currentEngine = ref(searchEngines[0])
 const isOpenSuggestions = ref(false)
 const isOpenSetting = ref(false)
 const isOpenAccount = ref(false)
+const isShowEngines = ref(false)
 
 const updateTime = function () {
   const now = new Date();
@@ -256,6 +258,10 @@ const selectEngine = (engine) => {
 const engineClick = () => {
   showEngines.value = !showEngines.value;
   firstShowEngines.value = false;
+
+  setTimeout(() => {
+    isShowEngines.value = showEngines.value
+  }, showEngines.value ? 0 : 300)
 }
 
 const search = async () => {
