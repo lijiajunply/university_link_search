@@ -116,7 +116,7 @@
 
   <!-- 固定在顶部的左右格式版本 -->
   <div :class="firstSticky ? 'opacity-0' : isSticky ? 'liquid-card-in' : 'liquid-card-out'"
-       class="fixed top-0 left-0 right-0 py-2 z-50 transition-all duration-300 transform translate-y-0 mx-6 my-4 rounded-lg liquid-card">
+       class="fixed top-0 left-0 right-0 py-2 z-50 transition-all duration-300 transform translate-y-0 mx-6 my-4 rounded-xl liquid-card">
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between">
         <!-- 左侧时间显示 -->
