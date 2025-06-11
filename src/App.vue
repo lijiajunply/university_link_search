@@ -5,6 +5,10 @@
     <!-- 搜索栏 -->
     <SearchBar :is-show-setting="isRightMenuVisible" ref="searchRef"/>
 
+    <template>
+
+    </template>
+
     <template v-if="categories.length > 0">
       <!-- 网站分类卡片 -->
       <div class="container mx-auto px-8 md:px-16 pt-16">
@@ -118,6 +122,10 @@
         v-model:show="showQrCodeModal"
         :currentLink="currentModalLink"
     />
+
+    <SettingCard
+        v-model:show="showSetting"
+    />
   </div>
 </template>
 
@@ -151,6 +159,7 @@ import SearchBar from "./components/SearchBar.vue";
 import {onMounted, onUnmounted, ref} from 'vue'
 import FooterContent from "./components/FooterContent.vue";
 import QrCodeModal from "./components/QrCodeModal.vue";
+import SettingCard from "./components/SettingCard.vue";
 
 const isWeiXin = ref(false)
 const isVisible = ref(false)
@@ -159,6 +168,7 @@ const showQrCodeModal = ref(false);
 const currentModalLink = ref(null);
 const isRightMenuVisible = ref(false)
 const searchRef = ref()
+const showSetting = ref(false)
 
 const getCategoryColClass = (index) => {
   const isLastOdd = index === categories.value.length - 1 && categories.value.length % 2 !== 0
@@ -214,12 +224,12 @@ const showMenu = (event) => {
 // 隐藏菜单
 const hideMenu = (event) => {
   const target = event.target
-  if(target.id === 'setting' ){
+  if (target.id === 'setting') {
     event.preventDefault()
     console.log('setting')
     return;
   }
-  if(searchRef.value.hide())return;
+  if (searchRef.value.hide()) return;
   isRightMenuVisible.value = false
 }
 

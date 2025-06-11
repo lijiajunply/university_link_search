@@ -1,7 +1,7 @@
 <template>
   <!-- 原始组件 -->
   <div ref="originalNav" class="pt-12 pb-8">
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto">
       <div class="grid grid-cols-3 gap-4 mt-8">
         <div></div>
         <div class="flex justify-center">
@@ -13,43 +13,35 @@
         </div>
         <div>
           <div class="flex justify-end" v-if="isShowSetting">
-           <div class="relative">
-             <div
-                 @mouseenter="isOpenAccount = true"
-                 @mouseleave="isOpenAccount = false"
-                 class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
-             >
-               <AccountCircleOutlineIcon class="text-gray-600"/>
-             </div>
-             <div
-                 class="absolute top-full right-1 mt-2 py-2 z-50"
-                 v-show="isOpenAccount"
-                 @mouseenter="isOpenAccount = true"
-                 @mouseleave="isOpenAccount = false"
-             >
-              <AccountCard/>
-             </div>
-           </div>
             <div class="relative">
               <div
-                  @click="isOpenSetting = !isOpenSetting"
-                  id="setting"
+                  @mouseenter="isOpenAccount = true"
+                  @mouseleave="isOpenAccount = false"
                   class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
               >
-                <CogIcon class="text-gray-600"/>
+                <AccountCircleOutlineIcon class="text-gray-600"/>
               </div>
               <div
-                  v-show="isOpenSetting && isShowSetting"
                   class="absolute top-full right-1 mt-2 py-2 z-50"
+                  v-show="isOpenAccount"
+                  @mouseenter="isOpenAccount = true"
+                  @mouseleave="isOpenAccount = false"
               >
-                <SettingCard/>
+                <AccountCard/>
               </div>
+            </div>
+            <div
+                @click="isOpenSetting = !isOpenSetting"
+                id="setting"
+                class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <CogIcon class="text-gray-600"/>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="max-w-2xl mx-auto mt-8">
+      <div class="mx-8 md:mx-auto mt-8 md:max-w-2xl">
         <div class="bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center px-4 py-3">
           <!-- 搜索引擎选择器 -->
           <div class="relative" id="chooseEngine">
@@ -110,7 +102,7 @@
           <!-- 搜索按钮 -->
           <button
               @click="search"
-              class="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors flex items-center space-x-2"
+              class="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors flex items-center space-x-2 desktop-phone"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -124,7 +116,7 @@
 
   <!-- 固定在顶部的左右格式版本 -->
   <div v-if="isSticky"
-       class="fixed top-0 left-0 right-0 bg-white/30 backdrop-blur-sm shadow-md py-2 z-50 transition-all duration-300 transform translate-y-0">
+       class="fixed top-0 left-0 right-0 py-2 z-50 transition-all duration-300 transform translate-y-0 mx-8 my-4 rounded-lg liquid-card">
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between">
         <!-- 左侧时间显示 -->
@@ -175,7 +167,7 @@
             <!-- 搜索按钮 -->
             <button
                 @click="search"
-                class="bg-blue-500 text-white p-1.5 rounded-full hover:bg-blue-600 transition-colors flex items-center"
+                class="bg-blue-500 text-white p-1.5 rounded-full hover:bg-blue-600 transition-colors flex items-center desktop-phone"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -187,6 +179,16 @@
       </div>
     </div>
   </div>
+
+  <svg style="position:absolute;width:0;height:0" v-if="isSticky">
+    <filter id="frosted" primitiveUnits="objectBoundingBox">
+      <feImage
+          href="licard.png"
+          x="0" y="0" width="100" height="100" result="map"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.02" result="blur"/>
+      <feDisplacementMap id="disp" in="blur" in2="map" scale="1" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
 </template>
 
 <script setup>
@@ -241,7 +243,7 @@ const originalNav = ref(null);
 const currentEngine = ref(searchEngines[0])
 const isOpenSuggestions = ref(false)
 const isOpenSetting = ref(false)
-const isOpenAccount  = ref(false)
+const isOpenAccount = ref(false)
 
 const updateTime = function () {
   const now = new Date();
@@ -260,7 +262,7 @@ const selectEngine = (engine) => {
 
 const engineClick = () => {
   showEngines.value = !showEngines.value;
-  firstShowEngines.value= false;
+  firstShowEngines.value = false;
 }
 
 const search = async () => {
@@ -319,7 +321,7 @@ const handleScroll = () => {
 };
 
 const hide = () => {
-  if(isOpenSetting.value){
+  if (isOpenSetting.value) {
     console.log(isOpenSetting.value)
     isOpenSetting.value = false
     return true
@@ -407,5 +409,35 @@ defineExpose({
     opacity: 0;
     transform: scale(.5)
   }
+}
+
+.liquid-card {
+  /* 玻璃效果 */
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+      0 8px 32px rgba(31, 38, 135, 0.08),
+      inset 0 1px 2px rgba(255, 255, 255, 0.6);
+
+  /* 悬停时的额外效果 */
+  transition: all 0.3s ease;
+  animation: fade-in-scale 0.5s ease-in-out;
+}
+
+/* 确保内部元素的背景适配玻璃效果 */
+.liquid-card .bg-white\/40 {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.liquid-card .bg-white\/90 {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+}
+
+/* 搜索框的玻璃效果增强 */
+.liquid-card .bg-white\/90.rounded-full {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1),
+  inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
 </style>

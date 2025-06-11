@@ -24,7 +24,7 @@
 
           <!-- 二维码图片 -->
           <div class="flex justify-center mb-6">
-            <img :src="qrCodeUrl" alt="QR Code" class="w-64 h-64" />
+            <img :src="qrCodeUrl" alt="QR Code" class="w-64 h-64"/>
           </div>
 
           <!-- 按钮 -->
@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import {ref, computed, watch} from 'vue';
+import {ref, watch} from 'vue';
 import QRCode from 'qrcode';
 import IconFont from "./IconFont.vue";
 
@@ -63,7 +63,7 @@ watch(() => props.currentLink, async (newLink) => {
       console.error('QR Code generation error:', err);
     }
   }
-}, { immediate: true });
+}, {immediate: true});
 
 function closeModal() {
   emit('update:show', false);
