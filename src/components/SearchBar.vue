@@ -180,15 +180,7 @@
     </div>
   </div>
 
-  <svg style="position:absolute;width:0;height:0" v-if="isSticky">
-    <filter id="frosted" primitiveUnits="objectBoundingBox">
-      <feImage
-          href="licard.png"
-          x="0" y="0" width="100" height="100" result="map"/>
-      <feGaussianBlur in="SourceGraphic" stdDeviation="0.02" result="blur"/>
-      <feDisplacementMap id="disp" in="blur" in2="map" scale="1" xChannelSelector="R" yChannelSelector="G"/>
-    </filter>
-  </svg>
+  <SettingCard v-model:show="isOpenSetting"/>
 </template>
 
 <script setup>
@@ -326,12 +318,6 @@ const handleScroll = () => {
 };
 
 const hide = () => {
-  if (isOpenSetting.value) {
-    console.log(isOpenSetting.value)
-    isOpenSetting.value = false
-    return true
-  }
-
   if (showEngines.value) {
     console.log(showEngines.value)
     return true
