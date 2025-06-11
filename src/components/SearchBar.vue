@@ -260,20 +260,20 @@ const engineClick = () => {
 
 const search = async () => {
   if (selectedSuggestionIndex.value !== -1) {
-    window.open(currentEngine.value.searchUrl + encodeURIComponent(suggestions.value[selectedSuggestionIndex.value]), '_blank')
+    window.open(currentEngine.value.searchUrl + encodeURIComponent(suggestions.value[selectedSuggestionIndex.value]))
     searchQuery.value = ''
     selectedSuggestionIndex.value = -1
     return
   }
 
   if (searchQuery.value.trim()) {
-    window.open(currentEngine.value.searchUrl + encodeURIComponent(searchQuery.value), '_blank')
+    window.open(currentEngine.value.searchUrl + encodeURIComponent(searchQuery.value))
   }
 }
 
 const transform = () => {
   if (searchQuery.value.trim()) {
-    window.open(`https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(searchQuery.value)}&op=translate`, '_blank')
+    window.open(`https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(searchQuery.value)}&op=translate`)
   }
 }
 
@@ -301,7 +301,7 @@ const getSuggestions = async () => {
 }
 
 const openUrl = (text) => {
-  window.open(currentEngine.value.searchUrl + encodeURIComponent(text), '_blank')
+  window.open(currentEngine.value.searchUrl + encodeURIComponent(text))
 }
 
 // 滚动监听函数
