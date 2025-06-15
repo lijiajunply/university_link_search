@@ -5,21 +5,23 @@
     <!-- 搜索栏 -->
     <SearchBar :is-show-setting="isRightMenuVisible" ref="searchRef"/>
 
-    <template>
-
-    </template>
+    <div class="mx-auto px-8 md:px-16 pt-8 z-[-10]">
+      <TilesCard class="opacity-0 animate-fade-in"
+                 :style="{ animationDelay: `${0.1}s`}"/>
+    </div>
 
     <template v-if="categories.length > 0">
       <!-- 网站分类卡片 -->
-      <div class="container mx-auto px-8 md:px-16 pt-16">
+      <div class="mx-auto px-8 md:px-16 pt-8 z-[-10]">
         <div class="flex justify-center items-center">
           <div :class="[
-                'grid grid-cols-8 gap-6 md:gap-8 transition-opacity duration-1000 ease-in-out',
-                isVisible ? 'opacity-100' : 'opacity-0']">
+                'grid grid-cols-8 gap-6 md:gap-8']">
             <div
                 v-for="(category, index) in categories"
                 :key="index"
                 :class="getCategoryColClass(index)"
+                class="opacity-0 animate-fade-in"
+                :style="{ animationDelay: `${index * 0.2}s`}"
             >
               <AppleCard class="h-full">
                 <template #title>
@@ -38,7 +40,7 @@
                 </template>
 
                 <template #context>
-                  <div class="grid grid-cols-12 gap-x-1 gap-y-3 mb-2 mt-2">
+                  <div class="grid grid-cols-12 gap-x-1 gap-y-3 mb-4 mt-2">
                     <div
                         v-for="link in category.links"
                         :class="getLinkColClass(index)"
@@ -112,8 +114,8 @@
         </div>
       </div>
 
-      <div :class="['transition-opacity duration-1000 ease-in-out',
-                isVisible ? 'opacity-100' : 'opacity-0']">
+      <div class="opacity-0 animate-fade-in"
+           :style="{ animationDelay: `${(categories.length+1) * 0.2}s`}">
         <FooterContent/>
       </div>
     </template>
@@ -141,13 +143,34 @@
   top: 0;
   transition: filter .25s, opacity 1s, transform .25s;
   width: 100%;
-  z-index: -3;
+  z-index: -9999;
 }
 
 .btn-description {
   color: #00000073;
   text-align: center;
   font-size: 0.8em;
+}
+
+@keyframes fade-in-scale {
+  0% {
+    opacity: 0;
+    transform: scale(.5)
+  }
+
+  48% {
+    opacity: 1;
+    transform: scale(1.03)
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1)
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in-scale 0.6s ease forwards;
 }
 </style>
 
@@ -160,9 +183,9 @@ import {onMounted, onUnmounted, ref} from 'vue'
 import FooterContent from "./components/FooterContent.vue";
 import QrCodeModal from "./components/QrCodeModal.vue";
 import SettingCard from "./components/SettingCard.vue";
+import TilesCard from "./components/TilesCard.vue";
 
 const isWeiXin = ref(false)
-const isVisible = ref(false)
 const categories = ref([])
 const showQrCodeModal = ref(false);
 const currentModalLink = ref(null);
@@ -263,10 +286,5 @@ onMounted(async () => {
   isWeiXin.value = !!/MicroMessenger/i.test(ua)
 
   categories.value = await fetch('https://link.xauat.site/api/Link/GetCategory').then(res => res.json())
-
-  // 组件挂载后触发浮现效果
-  setTimeout(() => {
-    isVisible.value = true
-  }, 100) // 短暂延迟以确保过渡效果正常
 })
 </script>

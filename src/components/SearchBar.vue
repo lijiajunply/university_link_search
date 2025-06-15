@@ -1,6 +1,6 @@
 <template>
   <!-- 原始组件 -->
-  <div ref="originalNav" class="pt-12 pb-8">
+  <div class="pt-12 pb-8 z-[9999]">
     <div class="container mx-auto">
       <div class="grid grid-cols-3 gap-4 mt-8">
         <div></div>
@@ -15,6 +15,7 @@
           <div class="flex justify-end" v-if="isShowSetting">
             <div class="relative">
               <div
+                  @click="isOpenLogin = true"
                   @mouseenter="isOpenAccount = true"
                   @mouseleave="isOpenAccount = false"
                   class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -42,7 +43,7 @@
       </div>
 
       <div class="mx-8 md:mx-auto mt-8 md:max-w-2xl">
-        <div class="bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center px-4 py-3">
+        <div class="bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center px-4 py-3 z-[9999]">
           <!-- 搜索引擎选择器 -->
           <div class="relative" id="chooseEngine">
             <button
@@ -56,7 +57,7 @@
             </button>
 
             <!-- 搜索引擎下拉菜单 -->
-            <div v-if="isShowEngines" :class="['absolute top-full left-0 mt-4 bg-white rounded-lg shadow-lg py-2 z-50',
+            <div v-if="isShowEngines" :class="['absolute top-full left-0 mt-4 bg-white rounded-lg shadow-lg py-2 z-[9999]',
             firstShowEngines ? 'opacity-0' : showEngines ? 'fade-in-scale' : 'fade-out-scale']">
               <button
                   v-for="engine in searchEngines"
@@ -182,6 +183,7 @@
   </div>
 
   <SettingCard v-model:show="isOpenSetting"/>
+  <LoginCard v-model:show="isOpenLogin"/>
 </template>
 
 <script setup>
@@ -190,6 +192,8 @@ import CogIcon from "vue-material-design-icons/Cog.vue";
 import AccountCircleOutlineIcon from "vue-material-design-icons/AccountCircleOutline.vue";
 import AccountCard from "./AccountCard.vue";
 import SettingCard from "./SettingCard.vue";
+import LocalStorageHelper from '../lib/localStorageHelper.js'
+import LoginCard from "./LoginCard.vue";
 
 defineProps({
   isShowSetting: {
@@ -239,6 +243,7 @@ const isOpenSuggestions = ref(false)
 const isOpenSetting = ref(false)
 const isOpenAccount = ref(false)
 const isShowEngines = ref(false)
+const isOpenLogin = ref(false)
 
 const updateTime = function () {
   const now = new Date();
@@ -253,6 +258,8 @@ const updateTime = function () {
 const selectEngine = (engine) => {
   currentEngine.value = engine
   showEngines.value = false
+
+  LocalStorageHelper.set('engine_num', engine.id - 1)
 }
 
 const engineClick = () => {
@@ -338,6 +345,9 @@ const hide = () => {
 
 // 添加和移除滚动事件监听
 onMounted(() => {
+  const num = LocalStorageHelper.get('engine_num') ?? 0
+  currentEngine.value = searchEngines[num]
+
   window.addEventListener('scroll', handleScroll);
   updateTime();
   // 每分钟更新一次时间
