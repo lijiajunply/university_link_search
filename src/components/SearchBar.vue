@@ -1,6 +1,6 @@
 <template>
   <!-- 原始组件 -->
-  <div class="pt-12 pb-8 z-[9999]">
+  <div ref="originalNav" class="pt-12 pb-8 z-[9999]">
     <div class="container mx-auto">
       <div class="grid grid-cols-3 gap-4 mt-8">
         <div></div>
