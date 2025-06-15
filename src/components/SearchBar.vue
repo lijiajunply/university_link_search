@@ -20,7 +20,9 @@
                   @mouseleave="isOpenAccount = false"
                   class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
               >
-                <AccountCircleOutlineIcon class="text-gray-600"/>
+                <Icon class="text-gray-600">
+                  <AccountCircleRound/>
+                </Icon>
               </div>
               <div
                   class="absolute top-full right-1 mt-2 py-2 z-50"
@@ -36,7 +38,9 @@
                 id="setting"
                 class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
             >
-              <CogIcon class="text-gray-600"/>
+              <Icon class="text-gray-600">
+                <Settings16Filled/>
+              </Icon>
             </div>
           </div>
         </div>
@@ -186,14 +190,15 @@
   <LoginCard v-model:show="isOpenLogin"/>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {onMounted, onUnmounted, ref} from 'vue'
-import CogIcon from "vue-material-design-icons/Cog.vue";
-import AccountCircleOutlineIcon from "vue-material-design-icons/AccountCircleOutline.vue";
 import AccountCard from "./AccountCard.vue";
 import SettingCard from "./SettingCard.vue";
 import LocalStorageHelper from '../lib/localStorageHelper.js'
 import LoginCard from "./LoginCard.vue";
+import {Settings16Filled} from '@vicons/fluent'
+import {AccountCircleRound} from '@vicons/material'
+import {Icon} from '@vicons/utils'
 
 defineProps({
   isShowSetting: {

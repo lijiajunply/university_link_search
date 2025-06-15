@@ -2,7 +2,9 @@
   <div class="p-6 rounded-lg w-sm backdrop-blur-xs bg-white/50">
     <!-- 头像占位符 -->
     <div class="flex justify-center mb-1">
-      <AccountCircleIcon />
+      <Icon class="text-gray-600">
+        <AccountCircleRound/>
+      </Icon>
     </div>
 
     <!-- 主标题 -->
@@ -15,5 +17,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import AccountCircleIcon from "vue-material-design-icons/AccountCircle.vue";
+import {AccountCircleRound} from '@vicons/material'
+import {Icon} from '@vicons/utils'
 </script>

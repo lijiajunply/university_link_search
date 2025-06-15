@@ -56,7 +56,9 @@
             还没有账户？
             <a href="https://www.xauat.site/Signup" class="text-blue-500 hover:text-blue-700 font-medium inline-flex items-center">
               立即注册!
-              <LinkIcon class="ml-1 " />
+              <Icon class="ml-1 ">
+                <LinkRound/>
+              </Icon>
             </a>
           </p>
         </div>
@@ -66,8 +68,9 @@
 </template>
 
 <script setup>
-import LinkIcon from "vue-material-design-icons/Link.vue";
 import '../lib/gzip.js'
+import {LinkRound} from '@vicons/material'
+import {Icon} from '@vicons/utils'
 
 defineProps({
   show: Boolean,
