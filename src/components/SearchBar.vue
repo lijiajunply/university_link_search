@@ -5,8 +5,8 @@
       <div class="grid grid-cols-3 gap-4 mt-8">
         <div></div>
         <div class="flex justify-center">
-          <div class="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 space-x-2">
-            <h1 class="text-4xl font-bold text-white">
+          <div class="bg-white/10 dark:bg-black/10 backdrop-blur-sm rounded-lg px-4 py-2 space-x-2">
+            <h1 class="text-4xl font-bold text-white dark:text-white/80">
               {{ time }}
             </h1>
           </div>
@@ -20,7 +20,7 @@
                   @mouseleave="isOpenAccount = false"
                   class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
               >
-                <Icon class="text-gray-600">
+                <Icon class="text-gray-600 text-2xl">
                   <AccountCircleRound/>
                 </Icon>
               </div>
@@ -38,7 +38,7 @@
                 id="setting"
                 class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
             >
-              <Icon class="text-gray-600">
+              <Icon class="text-gray-600 text-2xl">
                 <Settings16Filled/>
               </Icon>
             </div>
@@ -47,12 +47,13 @@
       </div>
 
       <div class="mx-8 md:mx-auto mt-8 md:max-w-2xl">
-        <div class="bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center px-4 py-3 z-[9999]">
+        <div
+            class="bg-white/90 dark:bg-black/30 backdrop-blur-sm rounded-full shadow-lg flex items-center px-4 py-3 z-[9999]">
           <!-- 搜索引擎选择器 -->
           <div class="relative" id="chooseEngine">
             <button
                 @click="engineClick"
-                class="flex items-center space-x-2 px-3 py-1 rounded-full hover:bg-gray-100 transition-colors"
+                class="flex items-center space-x-2 px-3 py-1 rounded-full dark:hover:bg-transparent hover:bg-gray-100 transition-colors"
             >
               <img :src="currentEngine.icon" :alt="currentEngine.name" class="w-5 h-5">
               <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,16 +62,18 @@
             </button>
 
             <!-- 搜索引擎下拉菜单 -->
-            <div v-if="isShowEngines" :class="['absolute top-full left-0 mt-4 bg-white rounded-lg shadow-lg py-2 z-[9999]',
-            firstShowEngines ? 'opacity-0' : showEngines ? 'fade-in-scale' : 'fade-out-scale']">
+            <div v-if="isShowEngines"
+                 :class="[firstShowEngines ? 'opacity-0' : showEngines ? 'fade-in-scale' : 'fade-out-scale']"
+                 class="absolute top-full left-0 mt-4 bg-white dark:bg-black/60 rounded-lg shadow-lg py-2 z-[9999]"
+            >
               <button
                   v-for="engine in searchEngines"
                   :key="engine.id"
                   @click="selectEngine(engine)"
-                  class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 w-full text-left"
+                  class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-900 w-full text-left"
               >
                 <img :src="engine.icon" :alt="engine.name" class="w-5 h-5">
-                <span class="text-gray-700">{{ engine.name }}</span>
+                <span class="text-gray-700 dark:text-white/90">{{ engine.name }}</span>
               </button>
             </div>
           </div>
@@ -83,23 +86,23 @@
                 @keyup="getSuggestions"
                 type="text"
                 :placeholder="`在 ${currentEngine.name} 中搜索`"
-                class="outline-none bg-transparent"
+                class="outline-none bg-transparent dark:text-gray-100"
             >
-            <div class="absolute left-0 mt-4 bg-white/70 backdrop-blur-sm rounded-lg shadow-lg z-40 "
+            <div class="absolute left-0 mt-4 bg-white/70 dark:bg-black/50 backdrop-blur-sm rounded-lg shadow-lg z-40 "
                  v-if="isOpenSuggestions">
               <button
                   @click="transform"
-                  class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 w-full text-left rounded-lg"
+                  class="flex items-center space-x-2 px-4 py-2 dark:hover:bg-gray-800 hover:bg-gray-100 w-full text-left rounded-lg"
               >
-                <span class="text-gray-700 text-sm">翻译: {{ searchQuery }}</span>
+                <span class="text-gray-700 text-sm dark:text-gray-100">翻译: {{ searchQuery }}</span>
               </button>
               <button
                   v-for="(suggestion, index) in suggestions"
                   @click="openUrl(suggestion)"
                   :class="{ 'bg-gray-100': index === selectedSuggestionIndex }"
-                  class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 w-full text-left rounded-lg"
+                  class="flex items-center space-x-2 px-4 py-2 dark:hover:bg-gray-800 hover:bg-gray-100 w-full text-left rounded-lg"
               >
-                <span class="text-gray-700 text-sm">{{ suggestion }}</span>
+                <span class="text-gray-700 text-sm dark:text-gray-100">{{ suggestion }}</span>
               </button>
             </div>
           </div>
@@ -107,7 +110,7 @@
           <!-- 搜索按钮 -->
           <button
               @click="search"
-              class="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors flex items-center space-x-2 desktop-phone"
+              class="dark:hover:bg-blue-600/80 dark:bg-blue-500/80 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors flex items-center space-x-2 desktop-phone"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -133,7 +136,7 @@
 
         <!-- 右侧搜索框 -->
         <div class="w-1/2">
-          <div class="bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center px-3 py-2">
+          <div class="bg-white/90 dark:bg-white/50 backdrop-blur-sm rounded-full shadow-lg flex items-center px-3 py-2">
             <!-- 搜索引擎选择器 -->
             <div class="relative">
               <button
@@ -147,16 +150,16 @@
               </button>
 
               <!-- 搜索引擎下拉菜单 -->
-              <div v-if="isShowEngines" :class="['absolute top-full left-0 mt-4 bg-white rounded-lg shadow-lg py-2 z-50',
+              <div v-if="isShowEngines" :class="['absolute top-full left-0 mt-4 bg-white dark:bg-gray-700 rounded-lg shadow-lg py-2 z-50',
             firstShowEngines ? 'opacity-0' : showEngines ? 'fade-in-scale' : 'fade-out-scale']">
                 <button
                     v-for="engine in searchEngines"
                     :key="engine.id"
                     @click="selectEngine(engine)"
-                    class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 w-full text-left"
+                    class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800  w-full text-left"
                 >
                   <img :src="engine.icon" :alt="engine.name" class="w-5 h-5">
-                  <span class="text-gray-700">{{ engine.name }}</span>
+                  <span class="text-gray-700 dark:text-gray-100">{{ engine.name }}</span>
                 </button>
               </div>
             </div>
@@ -190,7 +193,7 @@
   <LoginCard v-model:show="isOpenLogin"/>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import {onMounted, onUnmounted, ref} from 'vue'
 import AccountCard from "./AccountCard.vue";
 import SettingCard from "./SettingCard.vue";

@@ -2,10 +2,12 @@
   <div
       :id="id"
       :style="style"
+      class="bg-white dark:bg-black/50 shadow-lg hover:shadow-xl"
       :class="['apple-card', customClass]"
   >
     <div
         v-if="$slots.title"
+        class="bg-white/60 dark:bg-black/30"
         :class="['apple-card-header', headerClass]"
         :style="headerStyle"
     >
@@ -42,13 +44,11 @@ defineProps({
   min-height: 300px;
   max-height: 100%;
   transition: .2s;
-  background: rgba(255, 255, 255);
 
 }
 
 @media screen and (min-width: 768px) {
   .apple-card:hover {
-    box-shadow: 0 0 10px #C0C0C0;
     transform: scale(1.02);
     transition: box-shadow 0.3s, border-color 0.3s, transform 0.2s;
   }
@@ -61,7 +61,6 @@ defineProps({
 }
 
 .apple-card .apple-card-header {
-  background-color: rgba(248, 248, 252, .85);
   border-radius: 20px 20px 0 0;
   padding: 15px 30px 1px;
 }

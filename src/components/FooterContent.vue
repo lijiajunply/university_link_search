@@ -1,6 +1,6 @@
 <template>
   <div class="mx-auto px-8 md:px-16 pb-4 pt-8">
-    <footer class="bg-white/20 backdrop-blur-sm rounded-2xl  text-center p-8">
+    <footer class="bg-white/20 dark:bg-black/50 backdrop-blur-sm rounded-2xl  text-center p-8">
       <p class="layout-footer-title mb-4">
         &copy; 2025 iOS Club of XAUAT
       </p>
@@ -53,5 +53,19 @@
   color: #f3f5f7;
   background: linear-gradient(#07f2, #07f2) no-repeat center bottom / 100% 100%;
   border-radius: .2em;
+}
+
+@media (prefers-color-scheme: dark) {
+  .layout-footer-title {
+    color: #ffffff97;
+  }
+
+  .a {
+    color: #ffffff97;
+  }
+
+  .a:hover {
+    color: #ffffff97;
+  }
 }
 </style>

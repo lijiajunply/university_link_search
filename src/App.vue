@@ -30,11 +30,11 @@
                         :type="`#icon-${category.icon}`"
                         class="text-[40px]"
                     />
-                    <div class="font-bold text-[30px] leading-[1.35em]">
+                    <div class="font-bold text-[30px] leading-[1.35em] dark:text-white/90">
                       {{ category.name }}
                     </div>
                   </div>
-                  <div class="text-black/45 mt-0.5 mb-0.5">
+                  <div class="text-black/45 mt-0.5 mb-0.5 dark:text-white/65">
                     {{ category.description }}
                   </div>
                 </template>
@@ -71,7 +71,7 @@
                               :alt="link.name"
                               class="h-10 w-10 rounded"
                           />
-                          <div class="btn-description">{{ link.name }}</div>
+                          <div class="btn-description text-black/97 dark:text-white/65">{{ link.name }}</div>
                         </div>
                       </a>
 
@@ -102,7 +102,7 @@
                               :alt="link.name"
                               class="h-10 w-10 rounded"
                           />
-                          <div class="btn-description">{{ link.name }}</div>
+                          <div class="btn-description text-black/97 dark:text-white/65">{{ link.name }}</div>
                         </div>
                       </a>
                     </div>
@@ -147,7 +147,6 @@
 }
 
 .btn-description {
-  color: #00000073;
   text-align: center;
   font-size: 0.8em;
 }
