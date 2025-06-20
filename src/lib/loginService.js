@@ -10,7 +10,7 @@ async function calculateSHA1(input) {
 }
 
 // 对登录参数进行加密
-async function encodeLoginParams({ salt, username, password }) {
+async function encodeLoginParams({salt, username, password}) {
     if (!salt || !username || !password) {
         throw new Error('Invalid login parameters')
     }
@@ -49,7 +49,7 @@ async function fetchWithCookies(url) {
     const body = await resp.text()
     // 注意：浏览器 fetch 无法直接读到 set-cookie，若在 Node.js 环境请用 node-fetch + tough-cookie
     const setCookie = resp.headers.get('set-cookie') || ''
-    return { body, setCookie, finalUrl: resp.url }
+    return {body, setCookie, finalUrl: resp.url}
 }
 
 // 获取 studentId 或 HTML 表单域
@@ -94,9 +94,10 @@ export async function loginAsync(username, password) {
         throw new Error('Failed to get salt')
     }
     const cookies = parseCookie(setCookie)
+    localStorage.setItem('cookies', cookies)
 
     // 2) 构建加密参数
-    const encoded = await encodeLoginParams({ salt, username, password })
+    const encoded = await encodeLoginParams({salt, username, password})
 
     // 3) 发起登录请求
     const loginResp = await fetch('https://swjw.xauat.edu.cn/student/login', {
@@ -115,8 +116,9 @@ export async function loginAsync(username, password) {
     // 4) 再次访问获取 studentId 或表单值
     const studentId = await getCode(cookies)
     if (!studentId) {
-        return { success: false }
+        return {success: false}
     }
+    localStorage.setItem('studentId', studentId)
     return {
         success: true,
         studentId,

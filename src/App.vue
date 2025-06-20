@@ -178,7 +178,7 @@ import AppleCard from './components/AppleCard.vue'
 import IconFont from './components/IconFont.vue'
 import SearchBar from "./components/SearchBar.vue";
 
-import {onMounted, onUnmounted, ref} from 'vue'
+import {onMounted, onUnmounted, ref, watch} from 'vue'
 import FooterContent from "./components/FooterContent.vue";
 import QrCodeModal from "./components/QrCodeModal.vue";
 import SettingCard from "./components/SettingCard.vue";
@@ -280,6 +280,25 @@ onMounted(async () => {
     document.removeEventListener('keydown', handleKeydown)
     document.removeEventListener('contextmenu', handleContextMenu)
   })
+
+  const storageKey = 'site-theme';
+  const theme = ref(localStorage.getItem(storageKey) || '');
+  if (!theme.value) {
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    theme.value = isDark ? 'dark' : 'light';
+  }
+
+  const apply = (val) => {
+    const html = document.documentElement;
+    if (val === 'dark') html.classList.add('dark');
+    else html.classList.remove('dark');
+    localStorage.setItem(storageKey, val);
+  };
+
+  // 监听 theme 变化
+  watch(theme, (val) => {
+    apply(val);
+  }, {immediate: true});
 
   const ua = navigator.userAgent
   isWeiXin.value = !!/MicroMessenger/i.test(ua)

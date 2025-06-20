@@ -5,11 +5,7 @@ import AppleCard from "./AppleCard.vue";
 const todos = ref([])
 const clipboards = ref([])
 let token = localStorage.getItem('token')
-let isShowTiles = localStorage.getItem('is-show-tiles') === 'true'
-console.log(isShowTiles)
-let isShow = isShowTiles && (token === null || token.length !== 0)
-console.log(isShow)
-const isLoading = ref(isShow)
+const isLoading = ref(localStorage.getItem('is-show-tiles') === 'true' && (token === null || token.length !== 0))
 const newTodo = ref({
   title: '',
   status: false,
@@ -24,22 +20,6 @@ const addClipboard = async () => {
 
   clipboards.value.push(newClipboard.value)
   newClipboard.value = ''
-}
-
-const addTodo = () => {
-  if (newTodo.value.title.trim() === '') {
-    return
-  }
-
-  todos.value.push({
-    title: newTodo.value.title,
-    status: false,
-    description: '',
-    startTime: '',
-    endTime: '',
-  })
-
-  newTodo.value.title = ''
 }
 
 const removeTodo = (index) => {
@@ -65,7 +45,7 @@ onMounted(() => {
       <!-- Todo 列表 -->
       <AppleCard>
         <template #title>
-          <div class="font-bold text-[30px] leading-[1.35em]">
+          <div class="font-bold text-[30px] leading-[1.35em] dark:text-white/90">
             Todo
           </div>
         </template>
@@ -111,7 +91,7 @@ onMounted(() => {
 
       <AppleCard>
         <template #title>
-          <div class="font-bold text-[30px] leading-[1.35em]">
+          <div class="font-bold text-[30px] leading-[1.35em] dark:text-white/90">
             剪贴板
           </div>
         </template>

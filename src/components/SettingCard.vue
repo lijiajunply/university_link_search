@@ -6,19 +6,19 @@
         @click="closeModal"
     >
       <div
-          class="bg-white rounded-lg p-6 w-11/12 max-w-md mx-auto shadow-xl"
+          class="bg-white/80 dark:bg-gray-800/70 rounded-lg p-6 w-11/12 max-w-md mx-auto shadow-xl"
           @click.stop
       >
-        <div class="font-bold text-[30px] leading-[1.35em]">
-          设置
+        <div class="dark:text-gray-300 font-bold text-[30px] leading-[1.35em]">
+          应用设置
         </div>
 
         <div class="mt-4">
           <div class="flex items-center justify-between">
-            <div class="leading-[1.35em]">
+            <div class="dark:text-gray-300 leading-[1.35em]">
               是否显示磁贴
             </div>
-            <n-switch v-model:value="isShow"  @update:value="handleChange"/>
+            <n-switch v-model:value="isShow" @update:value="handleChange"/>
           </div>
         </div>
       </div>
@@ -40,7 +40,7 @@ function closeModal() {
   emit('update:show', false);
 }
 
-const isShow = ref(localStorage.getItem('is-show-tiles') ?? false)
+const isShow = ref(localStorage.getItem('is-show-tiles') === 'true')
 
 const handleChange = (value) => {
   localStorage.setItem('is-show-tiles', value)

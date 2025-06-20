@@ -50,16 +50,20 @@
         <div
             class="bg-white/90 dark:bg-black/30 backdrop-blur-sm rounded-full shadow-lg flex items-center px-4 py-3 z-[9999]">
           <!-- 搜索引擎选择器 -->
-          <div class="relative" id="chooseEngine">
+
+          <n-dropdown trigger="hover" :options="searchEngines" @select="selectEngine" class="bg-white dark:bg-black/60 rounded-lg shadow-lg py-2">
             <button
-                @click="engineClick"
                 class="flex items-center space-x-2 px-3 py-1 rounded-full dark:hover:bg-transparent hover:bg-gray-100 transition-colors"
             >
-              <img :src="currentEngine.icon" :alt="currentEngine.name" class="w-5 h-5">
+              <component :is="currentEngine.icon()" />
               <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </button>
+          </n-dropdown>
+
+          <div class="relative" id="chooseEngine">
+
 
             <!-- 搜索引擎下拉菜单 -->
             <div v-if="isShowEngines"
@@ -85,7 +89,7 @@
                 @keyup.enter="search"
                 @keyup="getSuggestions"
                 type="text"
-                :placeholder="`在 ${currentEngine.name} 中搜索`"
+                :placeholder="`在 ${currentEngine.label} 中搜索`"
                 class="outline-none bg-transparent dark:text-gray-100"
             >
             <div class="absolute left-0 mt-4 bg-white/70 dark:bg-black/50 backdrop-blur-sm rounded-lg shadow-lg z-40 "
@@ -138,38 +142,24 @@
         <div class="w-1/2">
           <div class="bg-white/90 dark:bg-white/50 backdrop-blur-sm rounded-full shadow-lg flex items-center px-3 py-2">
             <!-- 搜索引擎选择器 -->
-            <div class="relative">
+
+            <n-dropdown trigger="hover" :options="searchEngines" @select="selectEngine">
               <button
-                  @click="engineClick"
-                  class="flex items-center space-x-1 px-2 py-1 rounded-full hover:bg-gray-100 transition-colors"
+                  class="flex items-center space-x-2 px-3 py-1 rounded-full dark:hover:bg-transparent hover:bg-gray-100 transition-colors"
               >
-                <img :src="currentEngine.icon" :alt="currentEngine.name" class="w-4 h-4">
-                <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <component :is="currentEngine.icon()" />
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </button>
-
-              <!-- 搜索引擎下拉菜单 -->
-              <div v-if="isShowEngines" :class="['absolute top-full left-0 mt-4 bg-white dark:bg-gray-700 rounded-lg shadow-lg py-2 z-50',
-            firstShowEngines ? 'opacity-0' : showEngines ? 'fade-in-scale' : 'fade-out-scale']">
-                <button
-                    v-for="engine in searchEngines"
-                    :key="engine.id"
-                    @click="selectEngine(engine)"
-                    class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800  w-full text-left"
-                >
-                  <img :src="engine.icon" :alt="engine.name" class="w-5 h-5">
-                  <span class="text-gray-700 dark:text-gray-100">{{ engine.name }}</span>
-                </button>
-              </div>
-            </div>
+            </n-dropdown>
 
             <!-- 搜索输入框 -->
             <input
                 v-model="searchQuery"
                 @keyup.enter="search"
                 type="text"
-                :placeholder="`在 ${currentEngine.name} 中搜索`"
+                :placeholder="`在 ${currentEngine.label} 中搜索`"
                 class="flex-1 px-3 py-1 outline-none bg-transparent text-sm"
             >
 
@@ -194,7 +184,7 @@
 </template>
 
 <script setup>
-import {onMounted, onUnmounted, ref} from 'vue'
+import {onMounted, onUnmounted, ref,h} from 'vue'
 import AccountCard from "./AccountCard.vue";
 import SettingCard from "./SettingCard.vue";
 import LocalStorageHelper from '../lib/localStorageHelper.js'
@@ -202,6 +192,7 @@ import LoginCard from "./LoginCard.vue";
 import {Settings16Filled} from '@vicons/fluent'
 import {AccountCircleRound} from '@vicons/material'
 import {Icon} from '@vicons/utils'
+import {NDropdown} from 'naive-ui'
 
 defineProps({
   isShowSetting: {
@@ -210,30 +201,34 @@ defineProps({
   }
 })
 
+function renderIcon(icon) {
+  return () => {
+    return h('img', {class : 'w-5 h-5',src: icon});
+  };
+}
+
+const engineLink = ['https://www.baidu.com/s?wd=','https://www.google.com/search?q=','https://www.bing.com/search?q=','https://duckduckgo.com/?q=']
+
 const searchEngines = [
   {
-    id: 1,
-    name: '百度',
-    icon: 'https://www.baidu.com/favicon.ico',
-    searchUrl: 'https://www.baidu.com/s?wd='
+    key: '1',
+    label: '百度',
+    icon: renderIcon('https://www.baidu.com/favicon.ico'),
   },
   {
-    id: 2,
-    name: '谷歌',
-    icon: 'https://www.google.com/favicon.ico',
-    searchUrl: 'https://www.google.com/search?q='
+    key: '2',
+    label: '谷歌',
+    icon: renderIcon('https://www.google.com/favicon.ico'),
   },
   {
-    id: 3,
-    name: '必应',
-    icon: 'https://www.bing.com/favicon.ico',
-    searchUrl: 'https://www.bing.com/search?q='
+    key: '3',
+    label: '必应',
+    icon: renderIcon('https://www.bing.com/favicon.ico'),
   },
   {
-    id: 4,
-    name: 'DuckDuckGo',
-    icon: 'https://duckduckgo.com/favicon.ico',
-    searchUrl: 'https://duckduckgo.com/?q='
+    key: '4',
+    label: 'DuckDuckGo',
+    icon: renderIcon('https://duckduckgo.com/favicon.ico'),
   }
 ]
 
@@ -253,6 +248,9 @@ const isOpenAccount = ref(false)
 const isShowEngines = ref(false)
 const isOpenLogin = ref(false)
 
+const num = parseInt(LocalStorageHelper.get('engine_num') ?? '0')
+currentEngine.value = searchEngines[isNaN(num) ? 0 : num]
+
 const updateTime = function () {
   const now = new Date();
   // 获取小时和分钟
@@ -263,11 +261,12 @@ const updateTime = function () {
 };
 
 
-const selectEngine = (engine) => {
+const selectEngine = (key) => {
+  const engine = searchEngines.find(item => item.key === key)
   currentEngine.value = engine
   showEngines.value = false
 
-  LocalStorageHelper.set('engine_num', engine.id - 1)
+  LocalStorageHelper.set('engine_num', parseInt(engine.key) - 1)
 }
 
 const engineClick = () => {
@@ -281,14 +280,16 @@ const engineClick = () => {
 
 const search = async () => {
   if (selectedSuggestionIndex.value !== -1) {
-    window.open(currentEngine.value.searchUrl + encodeURIComponent(suggestions.value[selectedSuggestionIndex.value]))
+    const searchUrl = engineLink[parseInt(currentEngine.value.key) - 1] + encodeURIComponent(suggestions.value[selectedSuggestionIndex.value])
+    window.open(searchUrl)
     searchQuery.value = ''
     selectedSuggestionIndex.value = -1
     return
   }
 
   if (searchQuery.value.trim()) {
-    window.open(currentEngine.value.searchUrl + encodeURIComponent(searchQuery.value))
+    const searchUrl = engineLink[parseInt(currentEngine.value.key) - 1] + encodeURIComponent(suggestions.value[selectedSuggestionIndex.value])
+    window.open(searchUrl)
   }
 }
 
@@ -322,7 +323,8 @@ const getSuggestions = async () => {
 }
 
 const openUrl = (text) => {
-  window.open(currentEngine.value.searchUrl + encodeURIComponent(text))
+  const searchUrl = engineLink[parseInt(currentEngine.value.key) - 1] + encodeURIComponent(text)
+  window.open(searchUrl)
 }
 
 // 滚动监听函数
@@ -353,9 +355,6 @@ const hide = () => {
 
 // 添加和移除滚动事件监听
 onMounted(() => {
-  const num = LocalStorageHelper.get('engine_num') ?? 0
-  currentEngine.value = searchEngines[num]
-
   window.addEventListener('scroll', handleScroll);
   updateTime();
   // 每分钟更新一次时间
