@@ -146,6 +146,12 @@
   z-index: -9999;
 }
 
+@media (prefers-color-scheme: dark) {
+  .home-bg{
+    background-image: linear-gradient(to bottom right, #a03535, #525285, #1288b3);
+  }
+}
+
 .btn-description {
   text-align: center;
   font-size: 0.8em;

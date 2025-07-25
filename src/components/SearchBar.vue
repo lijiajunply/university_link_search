@@ -18,9 +18,9 @@
                   @click="isOpenLogin = true"
                   @mouseenter="isOpenAccount = true"
                   @mouseleave="isOpenAccount = false"
-                  class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/85 transition-colors"
               >
-                <Icon class="text-gray-600 text-2xl">
+                <Icon class="text-gray-600 dark:text-gray-300 text-2xl">
                   <AccountCircleRound/>
                 </Icon>
               </div>
@@ -36,9 +36,9 @@
             <div
                 @click="isOpenSetting = !isOpenSetting"
                 id="setting"
-                class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                class="flex items-center space-x-2 mx-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/85 transition-colors"
             >
-              <Icon class="text-gray-600 text-2xl">
+              <Icon class="text-gray-600 dark:text-gray-300 text-2xl">
                 <Settings16Filled/>
               </Icon>
             </div>
