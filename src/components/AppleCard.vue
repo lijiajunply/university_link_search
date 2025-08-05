@@ -7,7 +7,7 @@
   >
     <div
         v-if="$slots.title"
-        class="bg-white/60 dark:bg-black/30"
+        class="bg-white/60 dark:bg-gray-700/40"
         :class="['apple-card-header', headerClass]"
         :style="headerStyle"
     >

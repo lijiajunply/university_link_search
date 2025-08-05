@@ -30,7 +30,7 @@
                         :type="`#icon-${category.icon}`"
                         class="text-[40px]"
                     />
-                    <div class="font-bold text-[30px] leading-[1.35em] dark:text-white/90">
+                    <div class="font-bold text-[30px] leading-[1.35em] dark:text-white/80">
                       {{ category.name }}
                     </div>
                   </div>
@@ -148,7 +148,7 @@
 
 @media (prefers-color-scheme: dark) {
   .home-bg{
-    background-image: linear-gradient(to bottom right, #a03535, #525285, #1288b3);
+    background-image: linear-gradient(to top, #1e3c72 0%, #1e3c72 1%, #2a5298 100%);
   }
 }
 
