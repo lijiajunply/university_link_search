@@ -90,7 +90,7 @@
                 @keyup="getSuggestions"
                 type="text"
                 :placeholder="`在 ${currentEngine.label} 中搜索`"
-                class="outline-none bg-transparent dark:text-gray-100"
+                class="outline-none bg-transparent dark:text-gray-100 w-full"
             >
             <div class="absolute left-0 mt-4 bg-white/70 dark:bg-black/50 backdrop-blur-sm rounded-lg shadow-lg z-40 "
                  v-if="isOpenSuggestions">
