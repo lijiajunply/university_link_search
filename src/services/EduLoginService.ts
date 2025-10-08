@@ -1,7 +1,7 @@
 // loginService.js
 
 // 主登录函数
-export async function eduLogin(username, password) {
+export async function eduLoginService(username: string, password: string) {
     const loginResp = await fetch('https://swjw.xauat.edu.cn/student/login', {
         method: 'POST',
         headers: {

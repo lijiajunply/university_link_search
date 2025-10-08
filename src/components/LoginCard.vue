@@ -120,7 +120,7 @@ import {LinkRound} from '@vicons/material'
 import {Icon} from '@vicons/utils'
 import {reactive, ref} from 'vue'
 import {NSwitch, NInput, NButton} from "naive-ui";
-import {eduLogin} from '/src/lib/loginService.js'
+import {eduLoginService} from '/src/services/EduLoginService.js'
 import { useAuthorizationStore } from '../stores/Login'
 import { LoginService } from '../services/LoginService'
 
@@ -145,7 +145,7 @@ const handleChange = (value) => {
 }
 
 const handleGetData = async () => {
-  await eduLogin(userData.value.UserId, eduPassword.value)
+  await eduLoginService(userData.value.UserId, eduPassword.value)
 }
 
 // 登录时

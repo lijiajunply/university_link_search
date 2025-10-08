@@ -187,7 +187,7 @@
 import {onMounted, onUnmounted, ref,h} from 'vue'
 import AccountCard from "./AccountCard.vue";
 import SettingCard from "./SettingCard.vue";
-import LocalStorageHelper from '../lib/localStorageHelper.js'
+import LocalStorageHelper from '../lib/localStorageHelper.ts'
 import LoginCard from "./LoginCard.vue";
 import {Settings16Filled} from '@vicons/fluent'
 import {AccountCircleRound} from '@vicons/material'
@@ -372,18 +372,6 @@ defineExpose({
 </script>
 
 <style scoped>
-.fade-in-scale {
-  transform-origin: left top;
-  animation: fade-in-scale 0.3s ease-in-out;
-  opacity: 1;
-}
-
-.fade-out-scale {
-  transform-origin: left top;
-  animation: fade-out-scale 0.3s ease-in-out;
-  opacity: 0;
-}
-
 @keyframes fade-in-scale {
   0% {
     opacity: 0;
@@ -434,16 +422,6 @@ defineExpose({
 
   /* 悬停时的额外效果 */
   transition: all 0.3s ease;
-}
-
-.liquid-card-in {
-  animation: fade-in-scale 0.5s ease-in-out;
-  opacity: 1;
-}
-
-.liquid-card-out {
-  animation: fade-out-scale 0.15s ease-in-out;
-  opacity: 0;
 }
 
 /* 确保内部元素的背景适配玻璃效果 */
