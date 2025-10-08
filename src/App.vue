@@ -18,12 +18,13 @@ import {NMessageProvider, NDialogProvider, NConfigProvider, darkTheme} from 'nai
 const isDark = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
 const theme = computed(() => (isDark.value ? darkTheme : null))
 
-let mediaQuery
+let mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+const handler = (e) => {
+  isDark.value = e.matches
+}
+
 onMounted(() => {
-  mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  const handler = (e) => {
-    isDark.value = e.matches
-  }
   mediaQuery.addEventListener('change', handler)
 })
 

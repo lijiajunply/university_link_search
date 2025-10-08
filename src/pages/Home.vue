@@ -20,7 +20,7 @@ const getCategoryColClass = (index) => {
   const isLastOdd = index === categories.value.length - 1 && categories.value.length % 2 !== 0
 
   if (isLastOdd) {
-    return 'col-span-8 md:col-span-4 lg:col-span-8'
+    return 'col-span-8'
   }
 
   const i = index % 4 === 1 || index % 4 === 2 ? 5 : 3
@@ -146,104 +146,102 @@ onMounted(async () => {
     <template v-if="categories.length > 0">
       <!-- 网站分类卡片 -->
       <div class="mx-auto px-8 md:px-16 pt-8 z-[-10]">
-        <div class="flex justify-center items-center">
-          <div :class="[
+        <div :class="[
                 'grid grid-cols-8 gap-6 md:gap-8']">
-            <div
-                v-for="(category, index) in categories"
-                :key="index"
-                :class="getCategoryColClass(index)"
-                class="opacity-0 animate-fade-in"
-                :style="{ animationDelay: `${index * 0.2}s`}"
-            >
-              <AppleCard class="h-full">
-                <template #title>
-                  <div class="flex gap-2.5">
-                    <IconFont
-                        :type="`#icon-${category.icon}`"
-                        class="text-[40px]"
-                    />
-                    <div class="font-bold text-[30px] leading-[1.35em] dark:text-white/80">
-                      {{ category.name }}
-                    </div>
+          <div
+              v-for="(category, index) in categories"
+              :key="index"
+              :class="getCategoryColClass(index)"
+              class="opacity-0 animate-fade-in"
+              :style="{ animationDelay: `${index * 0.2}s`}"
+          >
+            <AppleCard class="h-full">
+              <template #title>
+                <div class="flex gap-2.5">
+                  <IconFont
+                      :type="`#icon-${category.icon}`"
+                      class="text-[40px]"
+                  />
+                  <div class="font-bold text-[30px] leading-[1.35em] dark:text-white/80">
+                    {{ category.name }}
                   </div>
-                  <div class="text-black/45 mt-0.5 mb-0.5 dark:text-white/65">
-                    {{ category.description }}
-                  </div>
-                </template>
+                </div>
+                <div class="text-black/45 mt-0.5 mb-0.5 dark:text-white/65">
+                  {{ category.description }}
+                </div>
+              </template>
 
-                <template #context>
-                  <div class="grid grid-cols-12 gap-x-1 gap-y-3 mb-4 mt-2">
-                    <div
-                        v-for="link in category.links"
-                        :class="getLinkColClass(index)"
+              <template #context>
+                <div class="grid grid-cols-12 gap-x-1 gap-y-3 mb-4 mt-2">
+                  <div
+                      v-for="link in category.links"
+                      :class="getLinkColClass(index)"
+                  >
+                    <a
+                        v-if="!isWeiXin && link.description === '微信打开'"
+                        @click="qrCodeModalOpen(link)"
+                        class="a-btn"
+                        :title="link.description"
                     >
-                      <a
-                          v-if="!isWeiXin && link.description === '微信打开'"
-                          @click="qrCodeModalOpen(link)"
-                          class="a-btn"
-                          :title="link.description"
-                      >
-                        <div class="flex flex-col justify-center items-center">
-                          <template v-if="link.icon">
-                            <img
-                                v-if="link.icon.startsWith('http')"
-                                v-lazy="link.icon"
-                                :alt="link.name"
-
-                                class="h-10 w-10 rounded"
-                            />
-                            <IconFont
-                                v-else
-                                :type="`#icon-${link.icon}`"
-                                class="text-[40px]"
-                            />
-                          </template>
+                      <div class="flex flex-col justify-center items-center">
+                        <template v-if="link.icon">
                           <img
+                              v-if="link.icon.startsWith('http')"
+                              v-lazy="link.icon"
+                              :alt="link.name"
+
+                              class="h-10 w-10 rounded"
+                          />
+                          <IconFont
                               v-else
-                              v-lazy="getIcon(link.url)"
+                              :type="`#icon-${link.icon}`"
+                              class="text-[40px]"
+                          />
+                        </template>
+                        <img
+                            v-else
+                            v-lazy="getIcon(link.url)"
+                            :alt="link.name"
+                            class="h-10 w-10 rounded"
+                        />
+                        <div class="btn-description text-black/97 dark:text-white/65">{{ link.name }}</div>
+                      </div>
+                    </a>
+
+                    <a
+                        v-else
+                        :href="link.url"
+                        target="_blank"
+                        class="a-btn"
+                        :title="link.description"
+                    >
+                      <div class="flex flex-col justify-center items-center">
+                        <template v-if="link.icon">
+                          <img
+                              v-if="link.icon.startsWith('http')"
+                              v-lazy="link.icon"
                               :alt="link.name"
                               class="h-10 w-10 rounded"
                           />
-                          <div class="btn-description text-black/97 dark:text-white/65">{{ link.name }}</div>
-                        </div>
-                      </a>
-
-                      <a
-                          v-else
-                          :href="link.url"
-                          target="_blank"
-                          class="a-btn"
-                          :title="link.description"
-                      >
-                        <div class="flex flex-col justify-center items-center">
-                          <template v-if="link.icon">
-                            <img
-                                v-if="link.icon.startsWith('http')"
-                                v-lazy="link.icon"
-                                :alt="link.name"
-                                class="h-10 w-10 rounded"
-                            />
-                            <IconFont
-                                v-else
-                                :type="`#icon-${link.icon}`"
-                                class="text-[40px]"
-                            />
-                          </template>
-                          <img
+                          <IconFont
                               v-else
-                              v-lazy="getIcon(link.url)"
-                              :alt="link.name"
-                              class="h-10 w-10 rounded"
+                              :type="`#icon-${link.icon}`"
+                              class="text-[40px]"
                           />
-                          <div class="btn-description text-black/97 dark:text-white/65">{{ link.name }}</div>
-                        </div>
-                      </a>
-                    </div>
+                        </template>
+                        <img
+                            v-else
+                            v-lazy="getIcon(link.url)"
+                            :alt="link.name"
+                            class="h-10 w-10 rounded"
+                        />
+                        <div class="btn-description text-black/97 dark:text-white/65">{{ link.name }}</div>
+                      </div>
+                    </a>
                   </div>
-                </template>
-              </AppleCard>
-            </div>
+                </div>
+              </template>
+            </AppleCard>
           </div>
         </div>
       </div>

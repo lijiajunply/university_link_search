@@ -116,17 +116,20 @@
 </template>
 
 <script setup>
-import '../lib/gzip.js'
 import {LinkRound} from '@vicons/material'
 import {Icon} from '@vicons/utils'
 import {reactive, ref} from 'vue'
-import {unzipObj} from "../lib/gzip.js";
 import {NSwitch, NInput, NButton} from "naive-ui";
-import {loginAsync} from '/src/lib/loginService.js'
+import {eduLogin} from '/src/lib/loginService.js'
+import { useAuthorizationStore } from '../stores/Login'
+import { LoginService } from '../services/LoginService'
 
 defineProps({
   show: Boolean,
 });
+
+const store = useAuthorizationStore();
+const isLogin = ref(store.isAuthenticated);
 
 const isShow = ref(localStorage.getItem('is-show-edu') === 'true')
 const userData = ref(null)
@@ -142,16 +145,12 @@ const handleChange = (value) => {
 }
 
 const handleGetData = async () => {
-  await loginAsync(userData.value.UserId, eduPassword.value)
+  await eduLogin(userData.value.UserId, eduPassword.value)
 }
 
 // 登录时
 
 const emit = defineEmits(['update:show']);
-
-let token = localStorage.getItem('token')
-const a = (token !== null && token.length !== 0)
-const isLogin = ref(a);
 
 function closeModal() {
   emit('update:show', false);
@@ -166,30 +165,17 @@ const handleSubmit = async () => {
   // 这里处理表单提交逻辑
   console.log('提交表单数据:', form)
   // 可以在这里添加表单验证和发送请求的逻辑
-  let res = await fetch('https://ioslife.zeabur.app/User', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(form)
-  })
-  if (res.ok) {
-    const token = await res.text()
-    localStorage.setItem('token', token)
-    res = await fetch('https://ioslife.zeabur.app/User', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    if (res.ok) {
-      const user = unzipObj(await res.text())
-      localStorage.setItem('user', JSON.stringify(user))
+  try {
+    const loginResult = await LoginService.login(form.name, form.id);
+    if (loginResult) {
+      // 登录成功，更新 store
+      await store.login({ username: form.name, password: form.id });
+      closeModal();
+    } else {
+      alert('登录失败');
     }
-    closeModal()
-  } else {
-    alert('登录失败')
+  } catch (error) {
+    alert('登录失败: ' + error.message);
   }
 }
 </script>
