@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NpgsqlDataProtection;
+using Scalar.AspNetCore;
 using UniversityLink.Data;
 using UniversityLink.DataApi.Repositories;
 using UniversityLink.DataApi.Services;
@@ -15,6 +18,41 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 #region 身份验证
+
+// 配置 OAuth2
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = false,
+        };
+
+        // 允许处理 OAuth2 不透明令牌
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // 从 Authorization 头中提取令牌
+                var authorizationHeader = context.HttpContext.Request.Headers.Authorization.FirstOrDefault();
+                if (!string.IsNullOrEmpty(authorizationHeader) && authorizationHeader.StartsWith("Bearer "))
+                {
+                    context.Token = authorizationHeader["Bearer ".Length..];
+                }
+
+                return Task.CompletedTask;
+            },
+            OnAuthenticationFailed = _ => Task.CompletedTask,
+            OnChallenge = _ => Task.CompletedTask
+        };
+    });
 
 builder.Services.AddAuthorizationBuilder()
     // 配置授权策略
@@ -53,6 +91,11 @@ builder.Services.AddCors(options =>
 var sql = Environment.GetEnvironmentVariable("SQL", EnvironmentVariableTarget.Process);
 if (string.IsNullOrEmpty(sql))
 {
+    builder.Services.AddDbContextFactory<LinkContext>(opt =>
+        opt.UseSqlite("Data Source=universitylink.db"));
+
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo("./keys"));
 }
 else
 {
@@ -93,10 +136,33 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<LinkContext>();
+
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        try
+        {
+            await context.Database.MigrateAsync();
+        }
+        catch
+        {
+            await context.Database.EnsureCreatedAsync();
+        }
+    }
+
+    await context.SaveChangesAsync();
+    await context.DisposeAsync();
+}
+
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors();
-
 app.MapControllers();
+app.MapScalarApiReference();
 
 app.Run();

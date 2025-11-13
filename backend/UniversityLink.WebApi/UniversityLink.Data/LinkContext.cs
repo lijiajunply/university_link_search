@@ -19,7 +19,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<LinkContex
     public LinkContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<LinkContext>();
-        optionsBuilder.UseNpgsql("Data Source=Data.db");
+        optionsBuilder.UseSqlite("Data Source=Data.db");
         return new LinkContext(optionsBuilder.Options);
     }
 }
