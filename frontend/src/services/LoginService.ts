@@ -1,4 +1,4 @@
-import {url} from "./UrlService.ts";
+import {url} from "./UrlService";
 
 export interface UserModel {
     userName: string;

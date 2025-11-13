@@ -372,6 +372,28 @@ defineExpose({
 </script>
 
 <style scoped>
+.fade-in-scale {
+  transform-origin: left top;
+  animation: fade-in-scale 0.3s ease-in-out;
+  opacity: 1;
+}
+
+.fade-out-scale {
+  transform-origin: left top;
+  animation: fade-out-scale 0.3s ease-in-out;
+  opacity: 0;
+}
+
+.liquid-card-in {
+  animation: fade-in-scale 0.5s ease-in-out;
+  opacity: 1;
+}
+
+.liquid-card-out {
+  animation: fade-out-scale 0.15s ease-in-out;
+  opacity: 0;
+}
+
 @keyframes fade-in-scale {
   0% {
     opacity: 0;

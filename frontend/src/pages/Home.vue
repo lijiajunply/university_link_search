@@ -127,7 +127,7 @@ onMounted(async () => {
   const ua = navigator.userAgent
   isWeiXin.value = !!/MicroMessenger/i.test(ua)
 
-  categories.value = await fetch('https://link.xauat.site/api/Link/GetCategory').then(res => res.json())
+  categories.value = await fetch('https://link.xauat.site/api/Category').then(res => res.json())
 })
 </script>
 
