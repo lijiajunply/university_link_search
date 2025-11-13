@@ -1,0 +1,7 @@
+﻿services:
+  universitylink.webapi:
+    image: universitylink.webapi
+    build:
+      context: .
+      dockerfile: UniversityLink.WebApi/Dockerfile
+

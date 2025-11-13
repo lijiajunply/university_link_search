@@ -1,0 +1,13 @@
+﻿bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+*.db
+*.db-shm
+*.db-wal
+
+keys/
+logs/
+
+appsettings.Development.json
