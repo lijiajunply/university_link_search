@@ -1,26 +1,13 @@
-import {url} from "./UrlService";
-
-export interface UserModel {
-    userName: string;
-    gender: string;
-}
-
-export interface LoginModel {
-    username: string;
-    password: string;
-}
+import { AuthService } from "./AuthService";
+import type { LoginRequest, TokenResponse } from "../models/auth";
 
 export class LoginService {
-    public static async login(username: string, password: string): Promise<any> {
-        return await fetch(`${url}/Login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: username,
-                password: password
-            })
-        }).then(res => res.json())
+    // 兼容旧接口，但内部使用新的AuthService
+    public static async login(username: string, password: string): Promise<TokenResponse> {
+        const loginRequest: LoginRequest = {
+            username,
+            password
+        };
+        return await AuthService.login(loginRequest);
     }
 }

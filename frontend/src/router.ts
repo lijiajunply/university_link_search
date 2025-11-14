@@ -8,6 +8,12 @@ const routes = [
         component: () => import('./pages/Home.vue'),
     },
     {
+        path: '/login',
+        name: 'Login',
+        meta: {title: "登录"},
+        component: () => import('./pages/Login.vue'),
+    },
+    {
         path: '/:catchAll(.*)',
         name: 'NotFound',
         meta: {title: "未能找到该页面"},

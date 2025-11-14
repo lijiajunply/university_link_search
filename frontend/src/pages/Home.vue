@@ -7,6 +7,7 @@ import AppleCard from "../components/AppleCard.vue";
 import FooterContent from "../components/FooterContent.vue";
 import SearchBar from "../components/SearchBar.vue";
 import {onMounted, onUnmounted, ref, watch} from "vue";
+import { CategoryService } from "../services/CategoryService";
 
 const isWeiXin = ref(false)
 const categories = ref([])
@@ -127,7 +128,7 @@ onMounted(async () => {
   const ua = navigator.userAgent
   isWeiXin.value = !!/MicroMessenger/i.test(ua)
 
-  categories.value = await fetch('https://link.xauat.site/api/Category').then(res => res.json())
+  categories.value = await CategoryService.getAllCategories()
 })
 </script>
 

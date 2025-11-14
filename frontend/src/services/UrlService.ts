@@ -1,1 +1,1 @@
-export const url = "https://localhost:7257"
+export const url = "https://link.xauat.site/api"

@@ -9,7 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@iconify/vue": "^5.0.0",
     "@tailwindcss/vite": "^4.1.8",
+    "echarts": "^6.0.0",
     "pinia": "^3.0.3",
     "qrcode": "^1.5.4",
     "tailwindcss": "^4.1.8",
