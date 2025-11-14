@@ -1,5 +1,6 @@
 import {defineStore} from 'pinia';
-import {type LoginModel, LoginService} from "../services/LoginService.ts";
+import {LoginService} from "../services/LoginService.ts";
+import {type LoginRequest} from "../models/auth.ts";
 
 export const useAuthorizationStore = defineStore('AuthorizationId', {
     state: () => ({
@@ -38,14 +39,14 @@ export const useAuthorizationStore = defineStore('AuthorizationId', {
     },
     actions: {
         // 修改token，并将token存入localStorage
-        async login(user: LoginModel): Promise<boolean> {
+        async login(user: LoginRequest): Promise<boolean> {
             try {
                 const a = await LoginService.login(user.username, user.password)
                 if (!a) {
                     return false;
                 }
-                this.Authorization = a.token;
-                localStorage.setItem('Authorization', a.token);
+                this.Authorization = a.accessToken;
+                localStorage.setItem('Authorization', a.accessToken);
                 return true;
             } catch (e) {
                 return false;

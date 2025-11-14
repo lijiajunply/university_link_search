@@ -18,7 +18,7 @@
             :key="item.path"
             :to="item.path"
             class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-medium transition-colors"
-            :class="{ 'text-blue-600 dark:text-blue-400': $route.path === item.path }"
+            :class="{ 'text-blue-600 dark:text-blue-400': isActiveRoute(item.path) }"
           >
             {{ item.label }}
           </router-link>
@@ -28,7 +28,7 @@
         <div class="flex items-center gap-3">
           <!-- 主题切换按钮 -->
           <button
-            @click="toggleTheme"
+            @click="handleThemeToggle"
             class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="切换主题"
           >
@@ -72,7 +72,7 @@
             :key="item.path"
             :to="item.path"
             class="px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-            :class="{ 'bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400': $route.path === item.path }"
+            :class="{ 'bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400': isActiveRoute(item.path) }"
             @click="mobileMenuOpen = false"
           >
             {{ item.label }}
@@ -97,7 +97,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { Icon } from '@iconify/vue';
 
 // Props
@@ -111,7 +111,11 @@ const props = withDefaults(defineProps<Props>(), {
   toggleTheme: () => {}
 });
 
-// 导航项
+// 路由相关
+const router = useRouter();
+const route = useRoute();
+
+// 导航项 - 根据router.ts中的路由配置动态生成
 const navItems = [
   { path: '/', label: '首页' },
   { path: '/links', label: '链接管理' },
@@ -123,16 +127,29 @@ const navItems = [
 // 移动端菜单状态
 const mobileMenuOpen = ref(false);
 
-// 路由
-const router = useRouter();
-
-// 用户状态（模拟）
+// 用户状态
 const isLoggedIn = ref(false);
 const userInitial = computed(() => isLoggedIn.value ? 'U' : '');
+
+// 处理主题切换
+const handleThemeToggle = () => {
+  if (props.toggleTheme) {
+    props.toggleTheme();
+  }
+};
 
 // 导航到登录页
 const navigateToLogin = () => {
   router.push('/login');
+};
+
+// 检查当前路由是否匹配导航项，处理根路径冲突
+const isActiveRoute = (path: string): boolean => {
+  // 处理根路径特殊情况
+  if (path === '/' && route.path === '') {
+    return true;
+  }
+  return route.path === path;
 };
 </script>
 
