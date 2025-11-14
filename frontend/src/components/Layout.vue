@@ -82,8 +82,8 @@
     </div>
 
     <!-- 主内容区 -->
-    <main class="flex-1 container mx-auto px-4 py-6">
-      <slot></slot>
+    <main class="flex-1 container mx-auto px-4 py-6 w-full">
+      <router-view/>
     </main>
 
     <!-- 底部 -->
