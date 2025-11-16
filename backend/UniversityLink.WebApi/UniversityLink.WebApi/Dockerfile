@@ -8,6 +8,8 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["UniversityLink.WebApi.csproj", "./"]
+COPY ["../UniversityLink.DataApi/UniversityLink.DataApi.csproj", "../UniversityLink.DataApi/"]
+COPY ["../UniversityLink.Data/UniversityLink.Data.csproj", "../UniversityLink.Data/"]
 RUN dotnet restore "UniversityLink.WebApi.csproj"
 COPY . .
 RUN dotnet build "UniversityLink.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
