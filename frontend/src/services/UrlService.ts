@@ -1,1 +1,1 @@
-export const url = "https://link.xauat.site/api"
+export const url = import.meta.env.VITE_API_URL || "https://link.xauat.site"
