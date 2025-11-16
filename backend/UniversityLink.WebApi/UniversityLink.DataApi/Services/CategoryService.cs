@@ -6,9 +6,10 @@ namespace UniversityLink.DataApi.Services;
 public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
 {
     // 获取所有分类
-    public async Task<List<CategoryModel>> GetAllCategoriesAsync(CancellationToken cancellationToken = default)
+    public async Task<List<CategoryModel>> GetAllCategoriesAsync(bool includeLinks = false,
+        CancellationToken cancellationToken = default)
     {
-        return (await unitOfWork.Categories.GetAllAsync(false, cancellationToken)).ToList();
+        return (await unitOfWork.Categories.GetAllAsync(includeLinks, cancellationToken)).ToList();
     }
 
     // 按ID获取分类
@@ -103,12 +104,12 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
     {
         if (string.IsNullOrWhiteSpace(keyword))
         {
-            return await GetAllCategoriesAsync(cancellationToken);
+            return await GetAllCategoriesAsync(false, cancellationToken);
         }
 
         // 在当前实现中，简单返回所有分类
         // 由于仓储没有Search方法，这里返回所有分类
-        return await GetAllCategoriesAsync(cancellationToken);
+        return await GetAllCategoriesAsync(false, cancellationToken);
     }
 
     public async Task<CategoryModel?> GetCategoryByName(string name, CancellationToken cancellationToken)

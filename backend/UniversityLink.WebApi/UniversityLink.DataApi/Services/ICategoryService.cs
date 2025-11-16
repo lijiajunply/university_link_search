@@ -5,7 +5,7 @@ namespace UniversityLink.DataApi.Services;
 public interface ICategoryService
 {
     // 获取所有分类
-    Task<List<CategoryModel>> GetAllCategoriesAsync(CancellationToken cancellationToken = default);
+    Task<List<CategoryModel>> GetAllCategoriesAsync(bool includeLinks = false, CancellationToken cancellationToken = default);
     
     // 按ID获取分类
     Task<CategoryModel?> GetCategoryByIdAsync(string id, CancellationToken cancellationToken = default);

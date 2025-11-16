@@ -15,7 +15,7 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
     {
         try
         {
-            var categories = await categoryService.GetAllCategoriesAsync(cancellationToken);
+            var categories = await categoryService.GetAllCategoriesAsync(true, cancellationToken);
             return Ok(categories);
         }
         catch (Exception ex)
@@ -23,10 +23,11 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
             return StatusCode(500, new { message = "获取分类列表失败", error = ex.Message });
         }
     }
-    
+
     // GET: api/category/{id}
     [HttpGet("{id}")]
-    public async Task<ActionResult<CategoryModel>> GetCategoryById(string id, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<CategoryModel>> GetCategoryById(string id,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -42,11 +43,12 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
             return StatusCode(500, new { message = "获取分类失败", error = ex.Message });
         }
     }
-    
+
     // POST: api/category
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<CategoryModel>> CreateCategory([FromBody] CategoryModel category, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<CategoryModel>> CreateCategory([FromBody] CategoryModel category,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -63,11 +65,12 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
             return StatusCode(500, new { message = "创建分类失败", error = ex.Message });
         }
     }
-    
+
     // PUT: api/category/{id}
     [HttpPost("update")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> UpdateCategory([FromBody] CategoryModel category, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> UpdateCategory([FromBody] CategoryModel category,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -87,7 +90,7 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
             return StatusCode(500, new { message = "更新分类失败", error = ex.Message });
         }
     }
-    
+
     // DELETE: api/category/{id}
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
@@ -111,11 +114,12 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
             return StatusCode(500, new { message = "删除分类失败", error = ex.Message });
         }
     }
-    
+
     // PUT: api/category/sort
     [HttpPut("sort")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> UpdateCategorySort([FromBody] List<string> categoryIds, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> UpdateCategorySort([FromBody] List<string> categoryIds,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -135,10 +139,11 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
             return StatusCode(500, new { message = "更新分类排序失败", error = ex.Message });
         }
     }
-    
+
     // GET: api/category/search?keyword=xxx
     [HttpGet("search")]
-    public async Task<ActionResult<List<CategoryModel>>> SearchCategories([FromQuery] string keyword, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<List<CategoryModel>>> SearchCategories([FromQuery] string keyword,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -150,7 +155,7 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
             return StatusCode(500, new { message = "搜索分类失败", error = ex.Message });
         }
     }
-    
+
     [HttpGet("byName/{name}")]
     public async Task<ActionResult<CategoryModel>> GetCategoryByName(string name,
         CancellationToken cancellationToken = default)
