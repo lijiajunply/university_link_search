@@ -1,164 +1,242 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-white">
-      <!-- 顶部导航栏 - 苹果风格磨砂效果 -->
-      <header
-        class="sticky top-0 z-50 backdrop-blur-lg bg-white/90 border-b border-gray-100 shadow-sm transition-all duration-300">
-        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-          <!-- 左侧Logo和标题 - 响应式设计 -->
-          <div class="flex items-center gap-3">
-            <Icon icon="logos:apple" class="h-6 w-6 text-black dark:text-white" />
-            <h1 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-2xl">建大导航</h1>
-          </div>
+  <div class="min-h-screen flex flex-col bg-[--bg-primary] transition-colors duration-300">
+    <!-- 顶部导航栏 - 苹果风格毛玻璃效果 -->
+    <header
+      class="sticky top-0 z-50 backdrop-blur-2xl bg-[--glass-bg] border-b border-[--border-primary] transition-all duration-300">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-14 sm:h-16">
+          <!-- Logo 区域 -->
+          <router-link to="/" class="flex items-center gap-2 sm:gap-3 group">
+            <div
+              class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300 group-hover:scale-105">
+              <Icon icon="solar:home-smile-bold" class="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            </div>
+            <span class="text-base sm:text-lg font-semibold text-[--text-primary] tracking-tight hidden xs:block">
+              建大导航
+            </span>
+          </router-link>
 
-          <!-- 右侧操作区 -->
-          <div class="flex items-center gap-4">
-            <!-- 导航链接 - 响应式设计，添加更多断点 -->
-            <nav class="hidden md:flex items-center space-x-6 lg:space-x-8">
-              <router-link v-for="item in navItems" :key="item.path" :to="item.path"
-                class="relative text-gray-700 hover:text-blue-500 text-sm md:text-base font-medium transition-colors duration-200 flex items-center gap-2"
-                :class="{ 'text-blue-500': isActiveRoute(item.path) }">
-                <!-- 桌面端导航图标 - 苹果风格 -->
-                <Icon :icon="getAppleStyleIcon(item.path)" class="h-4 w-4 md:h-5 md:w-5 text-gray-700" />
-                {{ item.label }}
-                <!-- 苹果风格下划线指示器 -->
-                <span v-if="isActiveRoute(item.path)"
-                  class="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-blue-500 dark:bg-blue-400 rounded-full transition-all duration-300"></span>
-              </router-link>
-            </nav>
-
-
-
-            <!-- 移动端菜单按钮 - 适配不同尺寸的触摸目标 -->
-            <button @click="mobileMenuOpen = !mobileMenuOpen"
-              class="md:hidden p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-w-11 min-h-11 flex items-center justify-center"
-              aria-label="菜单">
-              <Icon :icon="mobileMenuOpen ? 'mdi:close' : 'mdi:menu'" class="h-6 w-6 text-gray-700" />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <!-- 移动端菜单 - 苹果风格卡片效果 -->
-      <div v-if="mobileMenuOpen"
-        class="md:hidden bg-white border-b border-gray-100 shadow-md animate-in slide-in-from-top-5 duration-200">
-        <div class="container mx-auto px-4 py-2">
-          <nav class="flex flex-col space-y-1 py-2">
-            <router-link v-for="item in navItems" :key="item.path" :to="item.path"
-              class="px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 transition-all duration-200 flex items-center gap-3"
-              :class="{ 'bg-gray-50 text-blue-500': isActiveRoute(item.path) }" @click="mobileMenuOpen = false">
-              <!-- 移动端导航图标 - 苹果风格 -->
-              <Icon :icon="getAppleStyleIcon(item.path)" class="h-6 w-6 shrink-0" />
-              {{ item.label }}
+          <!-- 桌面端导航 -->
+          <nav class="hidden md:flex items-center gap-1">
+            <router-link
+              v-for="item in navItems"
+              :key="item.path"
+              :to="item.path"
+              class="relative px-3 lg:px-4 py-2 rounded-xl text-sm lg:text-base font-medium transition-all duration-200 group"
+              :class="isActiveRoute(item.path) 
+                ? 'text-blue-600 dark:text-blue-400' 
+                : 'text-[--text-secondary] hover:text-[--text-primary] hover:bg-[--hover-bg]'">
+              <div class="flex items-center gap-2">
+                <Icon :icon="item.icon" class="w-4 h-4 lg:w-5 lg:h-5" />
+                <span>{{ item.label }}</span>
+              </div>
+              <!-- 激活指示器 -->
+              <div
+                v-if="isActiveRoute(item.path)"
+                class="absolute inset-0 bg-blue-500/10 dark:bg-blue-400/10 rounded-xl -z-10" />
+              <div
+                v-if="isActiveRoute(item.path)"
+                class="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
             </router-link>
           </nav>
+
+          <!-- 移动端菜单按钮 -->
+          <button
+            @click="mobileMenuOpen = !mobileMenuOpen"
+            class="md:hidden w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[--hover-bg] transition-all duration-200 active:scale-95"
+            aria-label="菜单">
+            <Icon
+              :icon="mobileMenuOpen ? 'solar:close-circle-bold' : 'solar:hamburger-menu-bold'"
+              class="w-6 h-6 text-[--text-primary]" />
+          </button>
         </div>
       </div>
 
-      <!-- 主内容区 - 苹果风格内容容器，响应式边距和内边距 -->
-      <main class="flex-1 container mx-auto px-4 py-6 sm:py-8 md:py-10 w-full">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
-          <router-view />
+      <!-- 移动端导航菜单 -->
+      <Transition
+        enter-active-class="transition-all duration-300 ease-out"
+        enter-from-class="opacity-0 -translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition-all duration-200 ease-in"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 -translate-y-2">
+        <div v-if="mobileMenuOpen" class="md:hidden border-t border-[--border-primary]">
+          <nav class="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-1">
+            <router-link
+              v-for="item in navItems"
+              :key="item.path"
+              :to="item.path"
+              @click="mobileMenuOpen = false"
+              class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 active:scale-[0.98]"
+              :class="isActiveRoute(item.path)
+                ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                : 'text-[--text-secondary] hover:bg-[--hover-bg] hover:text-[--text-primary]'">
+              <Icon :icon="item.icon" class="w-5 h-5" />
+              <span class="font-medium">{{ item.label }}</span>
+              <Icon
+                v-if="isActiveRoute(item.path)"
+                icon="solar:check-circle-bold"
+                class="w-5 h-5 ml-auto" />
+            </router-link>
+          </nav>
         </div>
-      </main>
+      </Transition>
+    </header>
 
-      <!-- 底部信息栏 -->
-      <footer class="bg-white border-t border-gray-100 py-4">
-        <div class="container mx-auto px-4 text-center text-sm text-gray-500">
-          <p>© {{ new Date().getFullYear() }} 建大导航 - 简约高效的校园链接管理平台</p>
+    <!-- 主内容区域 -->
+    <main class="flex-1 w-full">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+        <Transition
+          mode="out-in"
+          enter-active-class="transition-all duration-300 ease-out"
+          enter-from-class="opacity-0 translate-y-4"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition-all duration-200 ease-in"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 -translate-y-4">
+          <router-view v-slot="{ Component }">
+            <component :is="Component" />
+          </router-view>
+        </Transition>
+      </div>
+    </main>
+
+    <!-- 底部信息 -->
+    <footer class="border-t border-[--border-primary] bg-[--bg-secondary]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-2 text-[--text-tertiary] text-sm">
+            <Icon icon="solar:copyright-bold" class="w-4 h-4" />
+            <span>{{ currentYear }} 建大导航</span>
+          </div>
+          <p class="text-[--text-tertiary] text-sm text-center sm:text-right">
+            简约高效的校园链接管理平台
+          </p>
         </div>
-      </footer>
-    </div>
+      </div>
+    </footer>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRoute } from 'vue-router';
-import { Icon } from '@iconify/vue';
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { Icon } from '@iconify/vue'
 
-
-// 响应式引用
-const mobileMenuOpen = ref(false);
-
-// 组合式API
-const route = useRoute();
-
-// 导航项配置 - 使用苹果系统风格图标
+// 导航项接口
 interface NavItem {
-  path: string;
-  label: string;
-  icon: string; // @iconify/vue 图标名称
-  appleIcon?: string; // 特定的苹果风格图标
+  path: string
+  label: string
+  icon: string
 }
 
+// 导航配置
 const navItems: NavItem[] = [
-  { path: '/', label: '首页', icon: 'lucide:home', appleIcon: 'logos:apple' },
-  { path: '/categories', label: '分类管理', icon: 'lucide:grid', appleIcon: 'icon-park:category' },
-  { path: '/users', label: '用户管理', icon: 'lucide:users', appleIcon: 'material-symbols:people-outline' },
-  { path: '/data', label: '数据管理', icon: 'lucide:database', appleIcon: 'material-symbols:storage-outline' }
-];
-
-// 方法
-// 检查当前路由是否激活 - 增强类型安全
-const isActiveRoute = (path: string): boolean => {
-  // 处理根路径特殊情况
-  if (path === '/' && (route.path === '' || route.path === '/')) {
-    return true;
+  { 
+    path: '/', 
+    label: '首页', 
+    icon: 'solar:home-2-bold-duotone' 
+  },
+  { 
+    path: '/categories', 
+    label: '分类管理', 
+    icon: 'solar:widget-5-bold-duotone' 
+  },
+  { 
+    path: '/users', 
+    label: '用户管理', 
+    icon: 'solar:users-group-rounded-bold-duotone' 
+  },
+  { 
+    path: '/data', 
+    label: '数据管理', 
+    icon: 'solar:database-bold-duotone' 
   }
-  // 精确匹配或子路径匹配
-  return route.path === path || route.path.startsWith(`${path}/`);
-};
+]
 
-// 获取苹果风格的图标 - 明确返回类型
-const getAppleStyleIcon = (path: string): string => {
-  const item = navItems.find(item => item.path === path);
-  return item?.appleIcon || item?.icon || 'lucide:help-circle';
-};
+// 响应式状态
+const mobileMenuOpen = ref(false)
+const route = useRoute()
+
+// 当前年份
+const currentYear = computed(() => new Date().getFullYear())
+
+// 判断路由是否激活
+const isActiveRoute = (path: string): boolean => {
+  if (path === '/') {
+    return route.path === '/' || route.path === ''
+  }
+  return route.path === path || route.path.startsWith(`${path}/`)
+}
 </script>
 
 <style scoped>
-/* 滚动条样式 - 苹果风格优化 */
-:deep(::-webkit-scrollbar) {
-  width: 10px;
-  height: 10px;
+/* CSS 变量 - 支持亮色和暗色模式 */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --border-primary: rgba(0, 0, 0, 0.08);
+  --hover-bg: rgba(0, 0, 0, 0.04);
 }
 
-:deep(::-webkit-scrollbar-track) {
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --glass-bg: rgba(0, 0, 0, 0.7);
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --text-tertiary: #6b7280;
+    --border-primary: rgba(255, 255, 255, 0.1);
+    --hover-bg: rgba(255, 255, 255, 0.06);
+  }
+}
+
+/* 如果使用类名切换暗色模式 */
+:global(.dark) {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --glass-bg: rgba(0, 0, 0, 0.7);
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-tertiary: #6b7280;
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --hover-bg: rgba(255, 255, 255, 0.06);
+}
+
+/* 自定义滚动条 - 苹果风格 */
+:deep(*::-webkit-scrollbar) {
+  width: 8px;
+  height: 8px;
+}
+
+:deep(*::-webkit-scrollbar-track) {
   background: transparent;
 }
 
-:deep(::-webkit-scrollbar-thumb) {
-  background: rgba(156, 163, 175, 0.5);
-  border-radius: 5px;
+:deep(*::-webkit-scrollbar-thumb) {
+  background: var(--text-tertiary);
+  border-radius: 4px;
   transition: background 0.2s ease;
 }
 
-:deep(::-webkit-scrollbar-thumb:hover) {
-  background: rgba(156, 163, 175, 0.7);
+:deep(*::-webkit-scrollbar-thumb:hover) {
+  background: var(--text-secondary);
 }
 
-/* 全局动画 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+/* 平滑滚动 */
+* {
+  scroll-behavior: smooth;
 }
 
-.animate-in {
-  animation: fadeIn 0.2s ease-out;
-}
-
-.slide-in-from-top-5 {
-  transform: translateY(-20px);
-  animation: slideInTop 0.3s ease-out forwards;
-}
-
-@keyframes slideInTop {
-  to {
-    transform: translateY(0);
+/* 响应式断点扩展 */
+@media (min-width: 475px) {
+  .xs\:block {
+    display: block;
   }
 }
 </style>
