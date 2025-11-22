@@ -11,7 +11,6 @@ public class AuthController(IAuthService authService, IUserService userService) 
 {
     // GET: api/auth/authorize
     [HttpGet("authorize")]
-    [AllowAnonymous]
     public ActionResult Authorize()
     {
         try
@@ -24,9 +23,9 @@ public class AuthController(IAuthService authService, IUserService userService) 
             var state = Guid.NewGuid().ToString(); // 简单的state实现，实际项目中应该存储在session或缓存中
 
             var authorizeUrl = $"https://api.xauat.site/SSO/authorize?" +
-                               $"client_id={clientId}&" +
+                               $"client_id={Uri.EscapeDataString(clientId)}&" +
                                $"redirect_uri={Uri.EscapeDataString(redirectUrl)}&" +
-                               $"state={state}&" +
+                               $"state={Uri.EscapeDataString(state)}&" +
                                $"response_type=code&" +
                                $"scope=profile email openid read";
 
@@ -41,7 +40,6 @@ public class AuthController(IAuthService authService, IUserService userService) 
 
     // GET: api/auth/callback
     [HttpGet("callback")]
-    [AllowAnonymous]
     public async Task<IActionResult> Callback([FromQuery] string code, [FromQuery] string state, CancellationToken cancellationToken = default)
     {
         try
@@ -92,9 +90,9 @@ public class AuthController(IAuthService authService, IUserService userService) 
                 await userService.CreateUserAsync(user, "default-password", cancellationToken);
             }
 
-            // 直接返回OAuth2访问令牌
+            // 直接返回OAuth2访问令牌，确保所有参数都正确编码
             return Redirect(
-                $"https://start.xauat.site/callback?token={tokenResponse.AccessToken}&sub={userInfo.Sub}&name={userInfo.Name}&role={userInfo.Role}");
+                $"https://start.xauat.site/callback?token={Uri.EscapeDataString(tokenResponse.AccessToken)}&sub={Uri.EscapeDataString(userInfo.Sub)}&name={Uri.EscapeDataString(userInfo.Name ?? string.Empty)}&role={Uri.EscapeDataString(userInfo.Role ?? string.Empty)}");
         }
         catch (Exception ex)
         {
