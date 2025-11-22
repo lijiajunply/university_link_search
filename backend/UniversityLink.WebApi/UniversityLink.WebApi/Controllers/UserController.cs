@@ -7,11 +7,12 @@ namespace UniversityLink.WebApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize(AuthenticationSchemes = "InternalJWT")]
 public class UserController(IUserService userService) : ControllerBase
 {
     // GET: api/user
     [HttpGet]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin", AuthenticationSchemes = "InternalJWT")]
     public async Task<ActionResult<List<UserModel>>> GetAllUsers(CancellationToken cancellationToken = default)
     {
         try
@@ -27,7 +28,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // GET: api/user/{id}
     [HttpGet("{id}")]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin", AuthenticationSchemes = "InternalJWT")]
     public async Task<ActionResult<UserModel>> GetUserById(string id, CancellationToken cancellationToken = default)
     {
         try
@@ -59,7 +60,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // GET: api/user/username/{username}
     [HttpGet("username/{username}")]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin", AuthenticationSchemes = "InternalJWT")]
     public async Task<ActionResult<UserModel>> GetUserByUsername(string username,
         CancellationToken cancellationToken = default)
     {
@@ -100,7 +101,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // POST: api/user
     [HttpPost]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin", AuthenticationSchemes = "InternalJWT")]
     public async Task<ActionResult<UserModel>> CreateUser([FromBody] UserModel user,
         CancellationToken cancellationToken = default)
     {
@@ -122,7 +123,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // PUT: api/user/{id}
     [HttpPut("{id}")]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin", AuthenticationSchemes = "InternalJWT")]
     public async Task<ActionResult> UpdateUser(string id, [FromBody] UserModel user,
         CancellationToken cancellationToken = default)
     {
@@ -165,7 +166,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // DELETE: api/user/{id}
     [HttpDelete("{id}")]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin", AuthenticationSchemes = "InternalJWT")]
     public async Task<ActionResult> DeleteUser(string id, CancellationToken cancellationToken = default)
     {
         try
@@ -185,7 +186,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // PUT: api/user/{id}/password
     [HttpPut("{id}/password")]
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin", AuthenticationSchemes = "InternalJWT")]
     public async Task<ActionResult> UpdatePassword(string id, [FromBody] PasswordUpdateModel passwordUpdate,
         CancellationToken cancellationToken = default)
     {

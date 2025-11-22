@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using UniversityLink.Data;
 using UniversityLink.DataApi.Services;
@@ -7,7 +7,7 @@ namespace UniversityLink.WebApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AuthController(IAuthService authService, IUserService userService) : ControllerBase
+public class AuthController(IAuthService authService, IUserService userService, IJwtGenerate generate) : ControllerBase
 {
     // GET: api/auth/authorize
     [HttpGet("authorize")]
@@ -15,22 +15,8 @@ public class AuthController(IAuthService authService, IUserService userService) 
     {
         try
         {
-            // 构建OAuth2授权URL
-            var clientId = Environment.GetEnvironmentVariable("OAUTH_CLIENT_ID") ?? "your-client-id";
-            var redirectUrl = Environment.GetEnvironmentVariable("OAUTH_REDIRECT_URI") ??
-                              "https://link.xauat.site/auth/callback";
-
-            var state = Guid.NewGuid().ToString(); // 简单的state实现，实际项目中应该存储在session或缓存中
-
-            var authorizeUrl = $"https://api.xauat.site/SSO/authorize?" +
-                               $"client_id={Uri.EscapeDataString(clientId)}&" +
-                               $"redirect_uri={Uri.EscapeDataString(redirectUrl)}&" +
-                               $"state={Uri.EscapeDataString(state)}&" +
-                               $"response_type=code&" +
-                               $"scope=profile email openid read";
-
-            // 重定向到OAuth2提供商
-            return Redirect(authorizeUrl);
+            // 使用OAuth中间件处理授权
+            return Challenge(new AuthenticationProperties { RedirectUri = "/" }, "ExternalOAuth");
         }
         catch (Exception ex)
         {
@@ -40,25 +26,26 @@ public class AuthController(IAuthService authService, IUserService userService) 
 
     // GET: api/auth/callback
     [HttpGet("callback")]
-    public async Task<IActionResult> Callback([FromQuery] string code, [FromQuery] string state, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Callback(CancellationToken cancellationToken = default)
     {
         try
         {
-            if (string.IsNullOrEmpty(code))
+            // 通过外部OAuth获取用户信息
+            var authenticateResult = await HttpContext.AuthenticateAsync("ExternalOAuth");
+
+            if (!authenticateResult.Succeeded)
             {
-                return BadRequest(new { message = "授权码不能为空" });
+                return Unauthorized(new { message = "OAuth2认证失败" });
             }
 
-            // 使用授权码获取访问令牌
-            var tokenResponse = await authService.GetAccessTokenAsync(code, cancellationToken);
-
-            if (tokenResponse?.AccessToken == null)
+            var accessToken = authenticateResult.Properties?.GetTokenValue("access_token");
+            if (string.IsNullOrEmpty(accessToken))
             {
                 return Unauthorized(new { message = "获取访问令牌失败" });
             }
 
             // 使用访问令牌获取用户信息
-            var userInfo = await authService.GetUserInfoAsync(tokenResponse.AccessToken, cancellationToken);
+            var userInfo = await authService.GetUserInfoAsync(accessToken, cancellationToken);
 
             if (string.IsNullOrEmpty(userInfo?.Sub))
             {
@@ -90,9 +77,11 @@ public class AuthController(IAuthService authService, IUserService userService) 
                 await userService.CreateUserAsync(user, "default-password", cancellationToken);
             }
 
-            // 直接返回OAuth2访问令牌，确保所有参数都正确编码
+            // 返回JWT格式的令牌给前端
+            var token = generate.GenerateJwtToken(userInfo);
+
             return Redirect(
-                $"https://start.xauat.site/callback?token={Uri.EscapeDataString(tokenResponse.AccessToken)}&sub={Uri.EscapeDataString(userInfo.Sub)}&name={Uri.EscapeDataString(userInfo.Name ?? string.Empty)}&role={Uri.EscapeDataString(userInfo.Role ?? string.Empty)}");
+                $"https://start.xauat.site/callback?token={Uri.EscapeDataString(token)}&sub={Uri.EscapeDataString(userInfo.Sub)}&name={Uri.EscapeDataString(userInfo.Name ?? string.Empty)}&role={Uri.EscapeDataString(userInfo.Role ?? string.Empty)}");
         }
         catch (Exception ex)
         {

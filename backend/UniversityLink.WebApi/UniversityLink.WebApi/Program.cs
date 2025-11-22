@@ -1,13 +1,17 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NpgsqlDataProtection;
 using Scalar.AspNetCore;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
 using UniversityLink.Data;
 using UniversityLink.DataApi.Repositories;
 using UniversityLink.DataApi.Services;
+using UniversityLink.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,48 +26,64 @@ builder.Services.AddOpenApi();
 // 配置 OAuth2
 builder.Services.AddAuthentication(options =>
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultAuthenticateScheme = "ExternalBearer";
+        options.DefaultChallengeScheme = "ExternalOAuth";
     })
-    .AddJwtBearer(options =>
+    .AddOAuth("ExternalOAuth", options =>
+    {
+        options.ClientId = Environment.GetEnvironmentVariable("OAUTH_CLIENT_ID") ?? "your-client-id";
+        options.ClientSecret = Environment.GetEnvironmentVariable("OAUTH_CLIENT_SECRET") ?? "your-client-secret";
+        options.CallbackPath = "/auth/callback";
+
+        options.AuthorizationEndpoint = "https://api.xauat.site/SSO/authorize";
+        options.TokenEndpoint = "https://api.xauat.site/SSO/token";
+        options.UserInformationEndpoint = "https://api.xauat.site/SSO/userinfo";
+
+        options.Scope.Add("profile");
+        options.Scope.Add("email");
+        options.Scope.Add("openid");
+        options.Scope.Add("read");
+
+        options.SaveTokens = true;
+
+        options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
+        options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+        options.ClaimActions.MapJsonKey(ClaimTypes.Role, "role");
+        options.ClaimActions.MapJsonKey("userName", "name");
+        options.ClaimActions.MapJsonKey("userId", "sub");
+        options.ClaimActions.MapJsonKey("role", "role");
+        options.ClaimActions.MapJsonKey("email", "email");
+        options.ClaimActions.MapJsonKey("avatar", "avatar");
+        options.ClaimActions.MapJsonKey("name", "name");
+        options.ClaimActions.MapJsonKey("sub", "sub");
+
+        options.Events.OnCreatingTicket = async context =>
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
+            request.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", context.AccessToken);
+
+            var response = await context.Backchannel.SendAsync(request, context.HttpContext.RequestAborted);
+            response.EnsureSuccessStatusCode();
+
+            var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+
+            context.RunClaimActions(json.RootElement);
+        };
+    })
+    .AddScheme<AuthenticationSchemeOptions, ExternalBearerHandler>("ExternalBearer", null)
+    .AddJwtBearer("InternalJWT", options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = false, // 对于外部OAuth令牌，可能需要特殊处理
-            ValidateIssuerSigningKey = false, // 对于外部OAuth令牌，可能没有我们期望的签名密钥
-        };
-
-        // 允许处理 OAuth2 不透明令牌
-        options.Events = new JwtBearerEvents
-        {
-            OnMessageReceived = context =>
-            {
-                // 从 Authorization 头中提取令牌
-                var authorizationHeader = context.HttpContext.Request.Headers.Authorization.FirstOrDefault();
-                if (!string.IsNullOrEmpty(authorizationHeader) && authorizationHeader.StartsWith("Bearer "))
-                {
-                    context.Token = authorizationHeader["Bearer ".Length..];
-                }
-
-                return Task.CompletedTask;
-            },
-            OnAuthenticationFailed = context =>
-            {
-                Console.WriteLine($"Authentication failed: {context.Exception}");
-                return Task.CompletedTask;
-            },
-            OnChallenge = context =>
-            {
-                Console.WriteLine($"Challenge: {context.AuthenticateFailure?.Message}");
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = _ =>
-            {
-                Console.WriteLine("Token validated successfully:");
-                return Task.CompletedTask;
-            }
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "UniversityLink",
+            ValidAudience = "UniversityLinkUsers",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                Environment.GetEnvironmentVariable("JWT_SECRET") ?? "your-secret-key-here-change-in-production"))
         };
     });
 
