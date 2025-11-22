@@ -46,7 +46,7 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
 
     // POST: api/category
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult<CategoryModel>> CreateCategory([FromBody] CategoryModel category,
         CancellationToken cancellationToken = default)
     {
@@ -68,7 +68,7 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
 
     // PUT: api/category/{id}
     [HttpPost("update")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult> UpdateCategory([FromBody] CategoryModel category,
         CancellationToken cancellationToken = default)
     {
@@ -93,7 +93,7 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
 
     // DELETE: api/category/{id}
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult> DeleteCategory(string id, CancellationToken cancellationToken = default)
     {
         try
@@ -117,7 +117,7 @@ public class CategoryController(ICategoryService categoryService) : ControllerBa
 
     // PUT: api/category/sort
     [HttpPut("sort")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult> UpdateCategorySort([FromBody] List<string> categoryIds,
         CancellationToken cancellationToken = default)
     {

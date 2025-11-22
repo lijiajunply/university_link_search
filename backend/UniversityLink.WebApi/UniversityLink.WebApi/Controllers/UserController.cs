@@ -11,7 +11,7 @@ public class UserController(IUserService userService) : ControllerBase
 {
     // GET: api/user
     [HttpGet]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult<List<UserModel>>> GetAllUsers(CancellationToken cancellationToken = default)
     {
         try
@@ -27,7 +27,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // GET: api/user/{id}
     [HttpGet("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult<UserModel>> GetUserById(string id, CancellationToken cancellationToken = default)
     {
         try
@@ -59,7 +59,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // GET: api/user/username/{username}
     [HttpGet("username/{username}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult<UserModel>> GetUserByUsername(string username,
         CancellationToken cancellationToken = default)
     {
@@ -100,7 +100,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // POST: api/user
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult<UserModel>> CreateUser([FromBody] UserModel user,
         CancellationToken cancellationToken = default)
     {
@@ -122,7 +122,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // PUT: api/user/{id}
     [HttpPut("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult> UpdateUser(string id, [FromBody] UserModel user,
         CancellationToken cancellationToken = default)
     {
@@ -165,7 +165,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // DELETE: api/user/{id}
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult> DeleteUser(string id, CancellationToken cancellationToken = default)
     {
         try
@@ -185,7 +185,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     // PUT: api/user/{id}/password
     [HttpPut("{id}/password")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult> UpdatePassword(string id, [FromBody] PasswordUpdateModel passwordUpdate,
         CancellationToken cancellationToken = default)
     {

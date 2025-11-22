@@ -60,11 +60,11 @@ builder.Services.AddAuthorizationBuilder()
         .RequireAuthenticatedUser()
         .Build())
     // 配置授权策略
-    .AddPolicy("AdminPolicy", policy =>
-        policy.RequireRole("Admin"))
+    .AddPolicy("Admin", policy =>
+        policy.RequireRole("Founder", "President", "Minister", "Department"))
     // 配置授权策略
-    .AddPolicy("UserPolicy", policy =>
-        policy.RequireRole("Admin", "User"));
+    .AddPolicy("User", policy =>
+        policy.RequireRole("Member", "Founder", "President", "Minister", "Department"));
 
 #endregion
 

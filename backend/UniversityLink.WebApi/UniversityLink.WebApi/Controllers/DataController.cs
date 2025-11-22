@@ -86,7 +86,7 @@ public class DataController(IDbContextFactory<LinkContext> dbFactory)
 
     // POST: api/data/upload
     [HttpPost("upload")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     public async Task<IActionResult> UploadFiles([FromForm] IFormFile? file,
         CancellationToken cancellationToken = default)
     {
