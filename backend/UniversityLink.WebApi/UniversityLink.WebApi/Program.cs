@@ -86,6 +86,21 @@ builder.Services.AddAuthentication(options =>
 
             context.RunClaimActions(json.RootElement);
         };
+
+        // 2.创建Ticket失败时触发
+        options.Events.OnRemoteFailure = context =>
+        {
+            Console.WriteLine(context.Failure?.Message);
+            context.Response.Redirect("/");
+            context.HandleResponse();
+            return Task.CompletedTask;
+        };
+        // 3.Ticket接收完成之后触发
+        options.Events.OnTicketReceived = context =>
+        {
+            Console.WriteLine(context.Principal);
+            return Task.CompletedTask;
+        };
     })
     .AddCookie()
     .AddScheme<AuthenticationSchemeOptions, ExternalBearerHandler>("ExternalBearer", null)
