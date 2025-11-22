@@ -28,7 +28,8 @@ builder.Services.AddOpenApi();
 // Configure Forwarded Headers
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto |
+                               ForwardedHeaders.XForwardedHost;
     options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
 });
@@ -38,7 +39,7 @@ builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = "ExternalBearer";
         options.DefaultChallengeScheme = "ExternalOAuth";
-        options.DefaultSignInScheme = "ExternalOAuth"; // 添加这行来解决错误
+        options.DefaultSignInScheme = "TempCookie";
     })
     .AddOAuth("ExternalOAuth", options =>
     {
@@ -81,6 +82,14 @@ builder.Services.AddAuthentication(options =>
 
             context.RunClaimActions(json.RootElement);
         };
+    })
+    .AddCookie("TempCookie", options =>
+    {
+        options.Cookie.Name = ".UniversityLink.TempAuth";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(5); // 短期有效
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
     })
     .AddScheme<AuthenticationSchemeOptions, ExternalBearerHandler>("ExternalBearer", null)
     .AddJwtBearer("InternalJWT", options =>
