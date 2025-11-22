@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
-        path: "",
+        path: "/",
         name: 'Home',
         meta: { title: "建大导航 - 起始页" },
         component: () => import('./pages/Home.vue'),
@@ -14,7 +14,7 @@ const routes = [
     },
     {
         path: '/admin',
-        name: "main",
+        name: "Centre",
         component: () => import('./layouts/CentreLayout.vue'),
         children: [
             {

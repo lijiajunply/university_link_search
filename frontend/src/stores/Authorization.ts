@@ -8,7 +8,8 @@ export const useAuthorizationStore = defineStore('AuthorizationId', {
         // 添加edu相关状态
         isShowEdu: localStorage.getItem('is-show-edu') === 'true',
         eduPassword: localStorage.getItem('edu-password') || '',
-        userData: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : null
+        userData: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : null,
+        clubData: localStorage.getItem('club-data') ? JSON.parse(localStorage.getItem('club-data') || '{}') : null
     }),
     getters: {
         getAuthorization: (state) => state.Authorization,
@@ -46,6 +47,8 @@ export const useAuthorizationStore = defineStore('AuthorizationId', {
         setClubData(data: ClubData) {
             localStorage.setItem('club-data', JSON.stringify(data));
             localStorage.setItem('Authorization', data.token);
+            this.Authorization = data.token;
+            this.clubData = data;
         },
         async handleGetEduData() {
             if (this.userData && this.userData.UserId) {
