@@ -17,9 +17,13 @@ public class AuthController(IUserService userService, IJwtGenerate generate) : C
     {
         try
         {
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = Url.Action("LoginLogic") // 生成 /Auth/LoginLogic
+            };
+
             // 使用OAuth中间件处理授权
-            return Challenge(new AuthenticationProperties { RedirectUri = Url.Action("Callback", "Auth") },
-                "ExternalOAuth");
+            return Challenge(properties, "ExternalOAuth");
         }
         catch (Exception ex)
         {
@@ -28,8 +32,8 @@ public class AuthController(IUserService userService, IJwtGenerate generate) : C
     }
 
     // GET: api/auth/callback
-    [HttpGet("callback")]
-    public async Task<IActionResult> Callback(CancellationToken cancellationToken = default)
+    [HttpGet("LoginLogic")]
+    public async Task<IActionResult> LoginLogic(CancellationToken cancellationToken = default)
     {
         try
         {
