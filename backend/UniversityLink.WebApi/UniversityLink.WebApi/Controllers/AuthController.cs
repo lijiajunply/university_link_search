@@ -5,14 +5,6 @@ using UniversityLink.DataApi.Services;
 
 namespace UniversityLink.WebApi.Controllers;
 
-// 添加OAuth相关的响应模型
-[Serializable]
-public class OAuthCallbackRequest
-{
-    public string Code { get; set; } = string.Empty;
-    public string State { get; set; } = string.Empty;
-}
-
 [ApiController]
 [Route("[controller]")]
 public class AuthController(IAuthService authService, IUserService userService) : ControllerBase
@@ -27,7 +19,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
             // 构建OAuth2授权URL
             var clientId = Environment.GetEnvironmentVariable("OAUTH_CLIENT_ID") ?? "your-client-id";
             var redirectUrl = Environment.GetEnvironmentVariable("OAUTH_REDIRECT_URI") ??
-                              "https://link.xauat.site/callback";
+                              "https://link.xauat.site/auth/callback";
 
             var state = Guid.NewGuid().ToString(); // 简单的state实现，实际项目中应该存储在session或缓存中
 
@@ -50,18 +42,17 @@ public class AuthController(IAuthService authService, IUserService userService) 
     // GET: api/auth/callback
     [HttpGet("callback")]
     [AllowAnonymous]
-    public async Task<IActionResult> Callback([FromQuery] OAuthCallbackRequest request,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Callback([FromQuery] string code, [FromQuery] string state, CancellationToken cancellationToken = default)
     {
         try
         {
-            if (string.IsNullOrEmpty(request.Code))
+            if (string.IsNullOrEmpty(code))
             {
                 return BadRequest(new { message = "授权码不能为空" });
             }
 
             // 使用授权码获取访问令牌
-            var tokenResponse = await authService.GetAccessTokenAsync(request.Code, cancellationToken);
+            var tokenResponse = await authService.GetAccessTokenAsync(code, cancellationToken);
 
             if (tokenResponse?.AccessToken == null)
             {
