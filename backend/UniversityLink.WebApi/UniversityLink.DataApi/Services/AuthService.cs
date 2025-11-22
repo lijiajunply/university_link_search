@@ -12,7 +12,7 @@ public class AuthService : IAuthService
         Environment.GetEnvironmentVariable("OAUTH_CLIENT_SECRET") ?? "your-client-secret";
 
     private readonly string _redirectUri =
-        Environment.GetEnvironmentVariable("OAUTH_REDIRECT_URI") ?? "https://start.xauat.site/callback";
+        Environment.GetEnvironmentVariable("OAUTH_REDIRECT_URI") ?? "https://link.xauat.site/auth/callback";
 
     private readonly string _oauthBaseUri =
         Environment.GetEnvironmentVariable("OAUTH_BASE_URI") ?? "https://api.xauat.site";
