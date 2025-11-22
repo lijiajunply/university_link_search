@@ -61,10 +61,6 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("read");
 
         options.SaveTokens = true;
-        options.StateDataFormat = new PropertiesDataFormat(
-            DataProtectionProvider.Create("UniversityLink.StateData")
-                .CreateProtector("Microsoft.AspNetCore.Authentication.OAuth.OAuthHandler<AuthenticationSchemeOptions>",
-                    "ExternalOAuth", "v1"));
 
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
         options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
