@@ -1,12 +1,13 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useSettingStore } from '../stores/SettingStore'
 import AppleCard from "./AppleCard.vue";
 
 const settingStore = useSettingStore()
-const isLoading = ref(settingStore.isLoading)
-const todos = ref(settingStore.todos)
-const clipboards = ref(settingStore.clipboards)
+const isLoading = computed(() => settingStore.isLoading)
+const todos = computed(() => settingStore.getTodos)
+const clipboards = computed(() => settingStore.getClipboards)
+
 const newClipboard = ref('')
 const newTodo = ref({
   title: '',
@@ -22,7 +23,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="!isLoading">
+  <div v-if="isLoading">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Todo 列表 -->
       <AppleCard>

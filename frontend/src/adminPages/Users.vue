@@ -15,7 +15,7 @@
     <!-- 搜索和筛选 -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
       <div class="flex flex-col lg:flex-row gap-4">
-        <div class="relative flex-grow">
+        <div class="relative grow">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Icon icon="ep:search" class="h-5 w-5 text-gray-400" />
           </div>
@@ -82,7 +82,7 @@
             <tr v-for="user in paginatedUsers" :key="user.userId" class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
-                  <div class="flex-shrink-0 h-10 w-10">
+                  <div class="shrink-0 h-10 w-10">
                     <img 
                       :src="getAvatarUrl(user)" 
                       alt="用户头像" 

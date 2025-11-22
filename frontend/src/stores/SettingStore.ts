@@ -14,8 +14,17 @@ export const useSettingStore = defineStore('setting', {
   
   getters: {
     isLoading: (state) => {
-      return state.showTiles && (state.token === null || state.token.length !== 0)
-    }
+      return state.showTiles
+    },
+    getTodos: (state) => {
+      return state.todos
+    },
+    getClipboards: (state) => {
+      return state.clipboards
+    },
+    getCurrentEngineKey: (state) => {
+      return state.currentEngineKey
+    },
   },
   
   actions: {
@@ -35,6 +44,7 @@ export const useSettingStore = defineStore('setting', {
     // TilesCard 相关操作
     setShowTiles(show: boolean) {
       this.showTiles = show
+      console.log('showTiles:', show)
       localStorage.setItem('is-show-tiles', show.toString())
     },
     

@@ -40,13 +40,13 @@
           class="bg-white/90 dark:bg-black/30 backdrop-blur-sm rounded-full shadow-lg flex items-center px-4 py-3 z-9999">
           <!-- 搜索引擎选择器 -->
           <div class="relative z-9999" id="chooseEngine">
-          <button @click.stop="showEngines = !showEngines"
-            class="flex items-center space-x-2 px-3 py-1 rounded-full dark:hover:bg-transparent hover:bg-gray-100 transition-colors">
-            <component :is="currentEngine.icon()" />
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
+            <button @click.stop="showEngines = !showEngines"
+              class="flex items-center space-x-2 px-3 py-1 rounded-full dark:hover:bg-transparent hover:bg-gray-100 transition-colors">
+              <component :is="currentEngine.icon()" />
+              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
 
             <!-- 搜索引擎下拉菜单 -->
             <div v-if="showEngines" :class="[showEngines ? 'fade-in-scale' : 'fade-out-scale']"
@@ -108,13 +108,13 @@
           <div class="bg-white/90 dark:bg-white/50 backdrop-blur-sm rounded-full shadow-lg flex items-center px-3 py-2">
             <!-- 搜索引擎选择器 -->
             <div class="relative z-9999">
-          <button @click.stop="showEngines = !showEngines"
-            class="flex items-center space-x-2 px-3 py-1 rounded-full dark:hover:bg-transparent hover:bg-gray-100 transition-colors">
-            <component :is="currentEngine.icon()" />
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
+              <button @click.stop="showEngines = !showEngines"
+                class="flex items-center space-x-2 px-3 py-1 rounded-full dark:hover:bg-transparent hover:bg-gray-100 transition-colors">
+                <component :is="currentEngine.icon()" />
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
               <!-- 搜索引擎下拉菜单 -->
               <div v-if="showEngines" :class="[showEngines ? 'fade-in-scale' : 'fade-out-scale']"
                 class="absolute top-full left-0 mt-4 bg-white dark:bg-black/60 rounded-lg shadow-lg py-2 z-9999">
@@ -156,6 +156,7 @@ import LoginCard from "./LoginCard.vue";
 import { Settings16Filled } from '@vicons/fluent'
 import { AccountCircleRound } from '@vicons/material'
 import { Icon } from '@vicons/utils'
+import { useSettingStore } from '../stores/SettingStore'
 
 // 定义搜索引擎类型
 interface SearchEngine {
@@ -164,14 +165,8 @@ interface SearchEngine {
   icon: any;
 }
 
-// 模拟SearchEngineStore，因为找不到原始模块
-const searchEngineStore = {
-  currentEngineKey: ref('1'),
-  initCurrentEngine: () => { },
-  setCurrentEngine: (key: string) => {
-    searchEngineStore.currentEngineKey.value = key;
-  }
-};
+// 使用SettingStore
+const settingStore = useSettingStore();
 
 defineProps({
   isShowSetting: {
@@ -227,7 +222,7 @@ const isOpenAccount = ref(false)
 const isOpenLogin = ref(false)
 
 // Watch for changes in the store
-watch(() => searchEngineStore.currentEngineKey.value, (newKey: string) => {
+watch(() => settingStore.getCurrentEngineKey, (newKey: string) => {
   const engine = searchEngines.find(item => item.key === newKey);
   if (engine) {
     currentEngine.value = engine;
@@ -245,8 +240,8 @@ const updateTime = function (): void {
 
 // Initialize current engine from store
 const initializeCurrentEngine = (): void => {
-  searchEngineStore.initCurrentEngine();
-  const engine = searchEngines.find(item => item.key === searchEngineStore.currentEngineKey.value);
+  settingStore.initCurrentEngine();
+  const engine = searchEngines.find(item => item.key === settingStore.getCurrentEngineKey);
   if (engine) {
     currentEngine.value = engine;
   }
@@ -263,7 +258,7 @@ const selectEngine = (engine: string | SearchEngine): void => {
   showEngines.value = false;
 
   // Use store instead of LocalStorageHelper
-  searchEngineStore.setCurrentEngine(engineKey);
+  settingStore.setCurrentEngine(engineKey);
 };
 
 const search = async (): Promise<void> => {
@@ -289,7 +284,23 @@ const search = async (): Promise<void> => {
 
 const transform = (): void => {
   if (searchQuery.value.trim()) {
-    window.open(`https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(searchQuery.value)}&op=translate`);
+    let searchUrl = '';
+    switch (currentEngine.value.key) {
+      case '1':
+        searchUrl = `https://fanyi.baidu.com/#auto/en/${encodeURIComponent(searchQuery.value)}`;
+        break;
+      case '2':
+        searchUrl = `https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(searchQuery.value)}&op=translate`;
+        break;
+      case '3':
+        searchUrl = `https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(searchQuery.value)}&op=translate`;
+        break;
+      case '4':
+        searchUrl = `https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(searchQuery.value)}&op=translate`;
+        break;
+    }
+
+    window.open(searchUrl);
   }
 };
 
@@ -372,7 +383,7 @@ const handleClickOutside = (event: MouseEvent): void => {
   const chooseEngine = document.getElementById('chooseEngine');
   const suggestionsElement = target.closest('.absolute.left-0.mt-4');
   const engineDropdown = target.closest('.absolute.top-full.left-0.mt-4');
-  
+
   // 检查是否点击了搜索引擎选择器及其内部元素，或者下拉菜单本身
   const isClickingEngine = chooseEngine?.contains(target) || engineDropdown;
   // 检查是否点击了搜索建议框
