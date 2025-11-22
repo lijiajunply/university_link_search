@@ -4,4 +4,6 @@
     build:
       context: .
       dockerfile: UniversityLink.WebApi/Dockerfile
-
+    environment:
+      - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
+      - ASPNETCORE_HTTP_PORTS=8080

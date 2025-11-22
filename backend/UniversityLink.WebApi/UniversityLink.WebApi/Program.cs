@@ -13,6 +13,7 @@ using UniversityLink.DataApi.Repositories;
 using UniversityLink.DataApi.Services;
 using UniversityLink.WebApi;
 using UniversityLink.WebApi.Controllers;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,14 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 #region 身份验证
+
+// Configure Forwarded Headers
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // 配置 OAuth2
 builder.Services.AddAuthentication(options =>
@@ -171,6 +180,9 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+// Use Forwarded Headers Middleware
+app.UseForwardedHeaders();
 
 using (var scope = app.Services.CreateScope())
 {
