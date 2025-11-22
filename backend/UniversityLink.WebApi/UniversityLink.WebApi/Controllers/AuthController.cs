@@ -5,13 +5,6 @@ using UniversityLink.DataApi.Services;
 
 namespace UniversityLink.WebApi.Controllers;
 
-[Serializable]
-public class TokenResponse
-{
-    public string AccessToken { get; set; } = string.Empty;
-    public string TokenType { get; set; } = string.Empty;
-}
-
 // 添加OAuth相关的响应模型
 [Serializable]
 public class OAuthCallbackRequest
@@ -27,7 +20,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
     // GET: api/auth/authorize
     [HttpGet("authorize")]
     [AllowAnonymous]
-    public ActionResult<string> Authorize()
+    public ActionResult Authorize()
     {
         try
         {
@@ -57,7 +50,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
     // GET: api/auth/callback
     [HttpGet("callback")]
     [AllowAnonymous]
-    public async Task<ActionResult<TokenResponse>> Callback([FromQuery] OAuthCallbackRequest request,
+    public async Task<IActionResult> Callback([FromQuery] OAuthCallbackRequest request,
         CancellationToken cancellationToken = default)
     {
         try
@@ -117,14 +110,4 @@ public class AuthController(IAuthService authService, IUserService userService) 
             return StatusCode(500, new { message = "OAuth2回调处理失败", error = ex.Message });
         }
     }
-}
-
-// 添加TokenValidationResponse类定义
-[Serializable]
-public class TokenValidationResponse
-{
-    public bool IsValid { get; set; }
-    public string? Username { get; set; }
-    public string? Role { get; set; }
-    public string? UserId { get; set; }
 }

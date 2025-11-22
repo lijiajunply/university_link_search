@@ -8,6 +8,11 @@ const routes = [
         component: () => import('./pages/Home.vue'),
     },
     {
+        path: '/callback',
+        name: 'Callback',
+        component: () => import('./pages/Callback.vue'),
+    },
+    {
         path: '/admin',
         name: "main",
         component: () => import('./layouts/CentreLayout.vue'),

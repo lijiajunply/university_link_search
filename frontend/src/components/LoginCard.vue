@@ -108,7 +108,7 @@ function closeModal() {
 
 // 处理OAuth授权登录
 const handleOAuthLogin = () => {
-  window.location.href = 'https://link.xauat.site/api/auth/authorize';
+  window.location.href = 'https://link.xauat.site/auth/authorize';
 }
 </script>
 
