@@ -21,18 +21,12 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
     // 按用户名获取用户
     public async Task<UserModel?> GetUserByUsernameAsync(string username, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(username))
+        if (string.IsNullOrEmpty(username))
         {
-            throw new ArgumentException("用户名不能为空");
+            return null;
         }
 
-        var user = await unitOfWork.Users.GetByUserNameAsync(username, cancellationToken);
-        if (user == null)
-        {
-            throw new KeyNotFoundException($"用户名 '{username}' 不存在");
-        }
-
-        return user;
+        return await unitOfWork.Users.GetByUserNameAsync(username, cancellationToken);
     }
 
     // 创建用户
@@ -155,30 +149,5 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
 
         // 删除用户
         await unitOfWork.Users.DeleteAsync(id, cancellationToken);
-    }
-
-    // 用户登录
-    public async Task<UserModel?> LoginAsync(string username, string password,
-        CancellationToken cancellationToken = default)
-    {
-        // 验证输入
-        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-        {
-            return null;
-        }
-
-        // 获取用户
-        var user = await unitOfWork.Users.GetByUserNameAsync(username, cancellationToken);
-        if (user == null)
-        {
-            return null;
-        }
-
-        // 简化密码验证（实际项目中应该有密码哈希机制）
-        // 这里假设密码存储在某个地方，或者需要额外的处理
-        // 简化处理，不更新登录时间
-        // 实际项目中应该有登录时间字段
-
-        return user;
     }
 }

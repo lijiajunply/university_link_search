@@ -110,14 +110,15 @@
               type="file" 
               class="hidden" 
               @change="handleFileUpload" 
-              accept=".csv,.xlsx,.xls"
+              accept=".json"
             />
             <Icon icon="ep:upload" class="h-10 w-10 text-gray-400 mx-auto mb-2" />
             <p class="text-gray-500 dark:text-gray-400">拖放文件到此处，或点击选择文件</p>
-            <p class="text-xs text-gray-400 mt-1">支持 CSV, Excel 格式</p>
+            <p class="text-xs text-gray-400 mt-1">支持 JSON 格式</p>
             <div v-if="selectedFile" class="mt-4 flex items-center justify-center">
               <Icon icon="ep:document" class="h-4 w-4 text-primary mr-2" />
               <span class="text-sm text-gray-700 dark:text-gray-300 truncate max-w-xs">{{ selectedFile.name }}</span>
+              <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">{{ formatFileSize(selectedFile.size) }}</span>
               <button @click="clearFile" class="ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                 <Icon icon="ep:close" class="h-4 w-4" />
               </button>
@@ -354,6 +355,7 @@ import { useMessage } from 'naive-ui'
 import { NSpin, NModal } from 'naive-ui'
 import { Icon } from '@iconify/vue'
 import * as echarts from 'echarts'
+import { DataService } from '../services/DataService'
 
 interface ImportResult {
   total: number
@@ -370,6 +372,7 @@ const importing = ref(false)
 const exporting = ref(false)
 const selectedFile = ref<File | null>(null)
 const showImportSuccessModal = ref(false)
+const isValidJsonFile = ref(false)
 
 // 导入配置
 const importType = ref('links')
@@ -589,6 +592,11 @@ const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
     selectedFile.value = target.files[0]
+    // 验证文件格式
+    const file = target.files[0]
+    const isJsonFile = file.type === 'application/json' || file.name.endsWith('.json')
+    const isFileSizeValid = file.size <= 10 * 1024 * 1024
+    isValidJsonFile.value = isJsonFile && isFileSizeValid
   }
 }
 
@@ -608,64 +616,85 @@ const importData = async () => {
   try {
     importing.value = true
     
-    // 实际项目中调用API导入数据
-    // const formData = new FormData()
-    // formData.append('file', selectedFile.value)
-    // formData.append('type', importType.value)
-    // formData.append('replace', replaceData.value.toString())
-    // const result = await DataService.importData(formData)
-    
-    // 模拟导入结果
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    importResult.value = {
-      total: 20,
-      success: 18,
-      failed: 2
+    // 验证文件格式
+    if (!selectedFile.value) {
+      message.error('请选择要导入的文件')
+      return
     }
     
-    importSuccessMessage.value = replaceData.value ? '数据已成功替换' : '数据已成功导入'
-    showImportSuccessModal.value = true
+    const file = selectedFile.value
+    if (!isValidJsonFile.value) {
+      if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+        message.error('请选择有效的JSON文件')
+      } else if (file.size > 10 * 1024 * 1024) {
+        message.error('文件大小不能超过10MB')
+      }
+      return
+    }
     
-    // 清除选择的文件
-    clearFile()
+    // 验证文件内容
+    const isValidJson = await DataService.readAndValidateJsonFile(selectedFile.value)
+    if (!isValidJson) {
+      message.error('文件内容不是有效的JSON格式')
+      return
+    }
     
-    // 重新加载统计数据
-    await loadStats()
+    // 调用API导入数据
+    const result = await DataService.uploadData(selectedFile.value)
     
-  } catch (error) {
-    message.error('导入失败，请重试')
+    if (result.success) {
+      importResult.value = {
+        total: 1,
+        success: 1,
+        failed: 0
+      }
+      importSuccessMessage.value = result.message || '数据导入成功'
+      showImportSuccessModal.value = true
+      
+      // 清除选择的文件
+      clearFile()
+      
+      // 重新加载统计数据
+      await loadStats()
+      
+      // 添加导入记录
+      addImportExportRecord('import', 'all', 'success', result.message)
+    }
+    
+  } catch (error: any) {
+    message.error(error.message || '导入失败，请重试')
+    // 添加失败记录
+    addImportExportRecord('import', 'all', 'failed', error.message || '导入失败')
   } finally {
     importing.value = false
   }
 }
 
 const exportData = async () => {
-  if (!hasSelectedExportItems.value) {
-    message.warning('请选择要导出的内容')
-    return
-  }
-  
   try {
     exporting.value = true
     
-    // 实际项目中调用API导出数据
-    // const params = {
-    //   types: Object.entries(exportOptions)
-    //     .filter(([_, value]) => value)
-    //     .map(([key]) => key),
-    //   format: exportFormat.value,
-    //   includeMetadata: includeMetadata.value
-    // }
-    // await DataService.exportData(params)
+    // 调用API导出数据
+    await DataService.downloadData()
     
-    // 模拟导出
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    // 获取选中的数据类型
+    const selectedTypes = Object.entries(exportOptions)
+      .filter(([_, value]) => value)
+      .map(([key]) => key)
+    
+    const dataTypeText = selectedTypes.length > 0 
+      ? selectedTypes.join(',') 
+      : 'all'
     
     message.success('导出成功')
     
-  } catch (error) {
-    message.error('导出失败，请重试')
+    // 添加导出记录
+    addImportExportRecord('export', dataTypeText, 'success', `导出了${selectedTypes.length > 0 ? selectedTypes.join('、') : '全部'}数据`)
+    
+  } catch (error: any) {
+    message.error(error.message || '导出失败，请重试')
+    // 添加失败记录
+    addImportExportRecord('export', 'all', 'failed', error.message || '导出失败')
   } finally {
     exporting.value = false
   }
@@ -690,6 +719,36 @@ const formatDate = (dateString: string): string => {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes'
+  
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+const addImportExportRecord = (type: 'import' | 'export', dataType: string, status: 'success' | 'failed', details: string) => {
+  const newRecord = {
+    id: Date.now().toString(),
+    type,
+    dataType,
+    operator: '当前用户', // 实际项目中应该从登录信息获取
+    timestamp: new Date().toISOString(),
+    status,
+    details
+  }
+  
+  // 添加到记录列表开头
+  recentRecords.value.unshift(newRecord)
+  
+  // 只保留最近10条记录
+  if (recentRecords.value.length > 10) {
+    recentRecords.value = recentRecords.value.slice(0, 10)
+  }
 }
 
 // 暗黑模式变化监听

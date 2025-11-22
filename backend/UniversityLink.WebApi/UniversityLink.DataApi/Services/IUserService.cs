@@ -24,7 +24,4 @@ public interface IUserService
     
     // 删除用户
     Task DeleteUserAsync(string id, CancellationToken cancellationToken = default);
-    
-    // 用户登录
-    Task<UserModel?> LoginAsync(string username, string password, CancellationToken cancellationToken = default);
 }

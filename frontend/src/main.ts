@@ -5,7 +5,7 @@ import 'vfonts/Lato.css'
 import 'vfonts/FiraCode.css'
 import {createPinia} from 'pinia'
 import VueLazyload from 'vue-lazyload'
-import router from './router.ts'
+import router from './router'
 
 import App from './App.vue'
 

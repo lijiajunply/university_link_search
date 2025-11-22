@@ -8,40 +8,34 @@ const routes = [
         component: () => import('./pages/Home.vue'),
     },
     {
-        path: '/',
+        path: '/admin',
         name: "main",
-        component: () => import('./components/Layout.vue'),
+        component: () => import('./layouts/CentreLayout.vue'),
         children: [
-            {
-                path: '/login',
-                name: 'Login',
-                meta: { title: "登录" },
-                component: () => import('./pages/Login.vue'),
-            },
             {
                 path: '/users',
                 name: 'Users',
                 meta: { title: "用户管理" },
-                component: () => import('./pages/Users.vue'),
-            },
-            {
-                path: '/links',
-                name: 'Links',
-                meta: { title: "链接管理" },
-                component: () => import('./pages/Links.vue'),
+                component: () => import('./adminPages/Users.vue'),
             },
             {
                 path: '/categories',
                 name: 'Categories',
                 meta: { title: "分类管理" },
-                component: () => import('./pages/Categories.vue'),
+                component: () => import('./adminPages/Categories.vue'),
             },
             {
                 path: '/data',
                 name: 'Data',
                 meta: { title: "数据管理" },
-                component: () => import('./pages/DataImportExport.vue'),
+                component: () => import('./adminPages/DataImportExport.vue'),
             },
+            {
+                path: '/category/:id',
+                name: 'Category',
+                meta: { title: "链接分类管理" },
+                component: () => import('./adminPages/Category.vue'),
+            }
         ]
     },
     {

@@ -132,14 +132,6 @@
                   <Icon icon="ep:edit" class="h-4 w-4" :class="isCurrentUser(user.userId) ? 'opacity-50' : ''" />
                 </button>
                 <button 
-                  @click="toggleUserStatus(user)" 
-                  class="text-info hover:text-info/80 mr-3 transition-colors"
-                  :disabled="isCurrentUser(user.userId)"
-                  :title="isCurrentUser(user.userId) ? '不能修改当前用户状态' : ''"
-                >
-                  <Icon icon="ep:switch-button" class="h-4 w-4" :class="isCurrentUser(user.userId) ? 'opacity-50' : ''" />
-                </button>
-                <button 
                   @click="deleteUser(user.userId)" 
                   class="text-danger hover:text-danger/80 transition-colors"
                   :disabled="isCurrentUser(user.userId)"
@@ -232,36 +224,6 @@
         </div>
 
         <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">姓名</label>
-          <input
-            v-model="form.name"
-            type="text"
-            placeholder="请输入姓名"
-            class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 py-2.5 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-          />
-        </div>
-
-        <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">邮箱</label>
-          <input
-            v-model="form.email"
-            type="email"
-            placeholder="请输入邮箱"
-            class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 py-2.5 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-          />
-        </div>
-
-        <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">手机号</label>
-          <input
-            v-model="form.phone"
-            type="tel"
-            placeholder="请输入手机号"
-            class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 py-2.5 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-          />
-        </div>
-
-        <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">角色 <span class="text-danger">*</span></label>
           <select
             v-model="form.role"
@@ -272,19 +234,6 @@
             <option value="admin">管理员</option>
           </select>
           <p v-if="isCurrentUserEditing" class="text-xs text-gray-500 dark:text-gray-400">不能修改当前用户的角色</p>
-        </div>
-
-        <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">状态 <span class="text-danger">*</span></label>
-          <select
-            v-model="form.status"
-            :disabled="!!isCurrentUserEditing"
-            class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 py-2.5 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-          >
-            <option value="active">启用</option>
-            <option value="inactive">禁用</option>
-          </select>
-          <p v-if="isCurrentUserEditing" class="text-xs text-gray-500 dark:text-gray-400">不能修改当前用户的状态</p>
         </div>
       </div>
       <template #footer>
@@ -312,7 +261,7 @@ import { useMessage } from 'naive-ui'
 import { NSpin, NModal } from 'naive-ui'
 import { Icon } from '@iconify/vue'
 import { UserService } from '../services/UserService'
-import type { UserModel } from '../models/user'
+import {type UserModel} from '../models/user'
 
 // 消息提示
 const message = useMessage()
@@ -337,17 +286,17 @@ const filterRole = ref('')
 // 数据
 const users = ref<UserModel[]>([])
 const currentUserId = ref<string | null>(null) // 可以从本地存储或全局状态获取
+const selectedUser = ref<UserModel | null>(null)
 
 // 表单数据
 const form = reactive({
   username: '',
   password: '',
-  name: '',
-  email: '',
-  phone: '',
-  role: 'user' as 'user' | 'admin',
-  status: 'active' as 'active' | 'inactive'
+  role: 'user' as 'admin' | 'user',
+  className: ''
 })
+
+const needUpdatePassword = ref(false)
 
 // 计算属性
 const filteredUsers = computed(() => {
@@ -386,15 +335,29 @@ const isCurrentUserEditing = computed(() => {
 const loadUsers = async () => {
   try {
     loading.value = true
-    users.value = await UserService.getAllUsers()
+    const data = await UserService.getAllUsers()
+    // 标准化用户数据格式，确保使用正确的属性名和类型
+    users.value = data.map((item: any) => ({
+      userId: item.userId,
+      userName: item.userName,
+      name: item.name || '',
+      email: item.email || '',
+      phone: item.phone || '',
+      identity: item.identity || 'user',
+      active: item.active !== undefined ? item.active : (item.status === 'active'), // 兼容status字段
+      createTime: item.createTime,
+      gender: item.gender || '',
+      className: item.className || ''
+    }))
+    
     // 假设获取当前用户信息
     const currentUser = await UserService.getCurrentUser()
     if (currentUser) {
       currentUserId.value = currentUser.userId
     }
   } catch (error) {
-    message.error('加载用户失败')
-  } finally {
+      message.error('加载用户失败')
+    } finally {
     loading.value = false
   }
 }
@@ -402,11 +365,7 @@ const loadUsers = async () => {
 const resetForm = () => {
   form.username = ''
   form.password = ''
-  form.name = ''
-  form.email = ''
-  form.phone = ''
   form.role = 'user'
-  form.status = 'active'
   editingId.value = null
 }
 
@@ -419,108 +378,108 @@ const closeDialog = () => {
   resetForm()
 }
 
-const selectedUser = ref<UserModel | null>(null)
-
 const editUser = (user: UserModel) => {
   editingUser.value = true
   showDialog.value = true
   selectedUser.value = user
   editingId.value = user.userId
   form.username = user.userName
-  form.password = '' // 编辑模式下密码为空
-  form.name = (user as any).name || ''
-  form.email = (user as any).email || ''
-  form.phone = (user as any).phone || ''
-  form.role = (user.identity || 'user') as 'user' | 'admin'
-  form.status = ((user as any).status || 'active') as 'active' | 'inactive'
+  form.password = '' // 清空密码字段，编辑时默认不修改密码
+  form.role = user.identity as 'admin' | 'user'
+  needUpdatePassword.value = false
+}
+
+const validateForm = (): boolean => {
+  if (!form.username || form.username.trim() === '') {
+    message.warning('请输入用户名')
+    return false
+  }
+  
+  // 新增用户或修改密码时验证密码
+  if (!editingUser.value || form.password) {
+    if (!form.password || form.password.length < 6) {
+      message.warning('密码长度不能少于6位')
+      return false
+    }
+    
+    // 密码强度检查
+    const passwordStrength = checkPasswordStrength(form.password)
+    if (passwordStrength < 2) {
+      message.warning('密码强度太弱，请包含字母和数字')
+      return false
+    }
+  }
+  
+  return true
+}
+
+// 密码强度检查
+const checkPasswordStrength = (password: string): number => {
+  let strength = 0
+  if (/[a-zA-Z]/.test(password)) strength++
+  if (/[0-9]/.test(password)) strength++
+  if (/[^a-zA-Z0-9]/.test(password)) strength++
+  if (password.length >= 8) strength++
+  return strength
 }
 
 const saveUser = async () => {
-  if (!form.username) {
-    message.warning('请填写用户名')
-    return
-  }
-  
-  if (!editingUser && !form.password) {
-    message.warning('请填写密码')
-    return
-  }
-  
   try {
+    // 表单验证
+    if (!validateForm()) {
+      return
+    }
+    
     saving.value = true
     
-    // 准备提交数据，编辑模式下如果密码为空则不更新密码
-      let submitData = { ...form }
-        if (editingUser && !submitData.password) {
-          // 不使用delete操作符，而是创建新对象
-          const { password, ...formWithoutPassword } = submitData
-          submitData = formWithoutPassword as any
-        }
-
-      if (editingId.value) {
-        // 编辑模式
-        const updateData = {
-          userId: editingId.value,
-          userName: submitData.username,
-          eMail: submitData.email,
-          gender: 'male',
-          identity: submitData.role,
-          className: '1-1',
-        } as UserModel
-        if (submitData.password) {
-          (updateData as any).Password = submitData.password
-        }
-        await UserService.updateUser(editingId.value!, updateData)
-        message.success('更新成功')
-      } else {
-        // 创建模式
-        const createData: any = {
-          UserName: submitData.username,
-          Password: submitData.password,
-          Name: submitData.name,
-          Email: submitData.email,
-          Phone: submitData.phone,
-          Role: submitData.role,
-          Status: submitData.status
-        }
-        await UserService.createUser(createData)
-        message.success('创建成功')
+    // 准备用户数据，使用正确的类型和字段名
+    const userData: Partial<UserModel> = {
+      userName: form.username,
+      identity: form.role,
+    }
+    
+    if (editingId.value) {
+      // 编辑模式
+      const baseData: UserModel = {
+        userId: editingId.value,
+        userName: form.username,
+        identity: form.role,
+        className: form.className,
       }
+      
+      await UserService.updateUser(editingId.value, baseData)
+      
+      // 如果提供了新密码，则更新密码
+      if (form.password) {
+        await UserService.updatePassword(editingId.value, form.password)
+      }
+      
+      message.success('更新成功')
+    } else {
+      // 创建模式
+      if (!form.password) {
+        throw new Error('创建用户必须提供密码')
+      }
+      
+      const createData: UserModel = {
+        ...userData as UserModel,
+        userId: '', // 将由后端生成
+      }
+      
+      await UserService.createUser(createData)
+      message.success('创建成功')
+    }
     
     await loadUsers()
     closeDialog()
-  } catch (error) {
-    message.error(editingId.value ? '更新失败' : '创建失败')
+  } catch (error: any) {
+    console.error('保存用户失败:', error)
+    message.error(editingId.value ? '更新失败: ' + (error.message || '') : '创建失败: ' + (error.message || ''))
   } finally {
     saving.value = false
   }
 }
 
-const toggleUserStatus = async (user: UserModel) => {
-  if (isCurrentUser(user.userId)) {
-    message.warning('不能修改当前用户的状态')
-    return
-  }
-  
-  const newStatus = (user as any).status === 'active' ? 'inactive' : 'active'
-  const statusText = newStatus === 'active' ? '启用' : '禁用'
-  
-  if (confirm(`确定要${statusText}用户「${user.userName}」吗？`)) {
-    try {
-      await UserService.updateUser(user.userId, {
-        userId: user.userId,
-        userName: user.userName,
-        gender: user.gender,
-        className: user.className,
-        identity: user.identity,
-      })
-      message.success(`${statusText}成功`)
-      await loadUsers()
-    } catch (error) {
-      message.error(`${statusText}失败`)
-    }
-  }
-}
 
 const deleteUser = async (id: string) => {
   if (isCurrentUser(id)) {
@@ -531,26 +490,35 @@ const deleteUser = async (id: string) => {
   const user = users.value.find((u: UserModel) => u.userId === id)
   if (!user) return
   
-  if (confirm(`确定要删除用户「${user.userName}」吗？此操作不可恢复。`)) {
-    try {
-      await UserService.deleteUser(id)
-      message.success('删除成功')
-      await loadUsers()
-    } catch (error) {
-      message.error('删除失败')
-    }
+  // 确认对话框
+  if (!confirm(`确定要删除用户「${user.userName}」吗？此操作不可撤销。`)) {
+    return
+  }
+  
+  try {
+    await UserService.deleteUser(id)
+    message.success('删除成功')
+    await loadUsers()
+  } catch (error: any) {
+    console.error('删除用户失败:', error)
+    message.error('删除失败: ' + (error.message || '请重试'))
   }
 }
 
 const prevPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--
+  } else {
+    message.info('已经是第一页了')
   }
 }
 
 const nextPage = () => {
-  if (endIndex.value < filteredUsers.value.length) {
+  const totalPages = Math.ceil(filteredUsers.value.length / pageSize)
+  if (currentPage.value < totalPages) {
     currentPage.value++
+  } else {
+    message.info('已经是最后一页了')
   }
 }
 

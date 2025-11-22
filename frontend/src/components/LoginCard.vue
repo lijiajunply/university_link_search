@@ -1,14 +1,8 @@
 <template>
   <Teleport to="body">
-    <div
-        v-if="show"
-        class="fixed inset-0 backdrop-blur-md bg-black/30 flex items-center justify-center z-50"
-        @click="closeModal"
-    >
-      <div
-          class="bg-white/80 dark:bg-gray-800/70 rounded-lg p-8 w-11/12 max-w-md mx-auto shadow-xl"
-          @click.stop
-      >
+    <div v-if="show" class="fixed inset-0 backdrop-blur-md bg-black/30 flex items-center justify-center z-50"
+         @click="closeModal">
+      <div class="bg-white/80 dark:bg-gray-800/70 rounded-lg p-8 w-11/12 max-w-md mx-auto shadow-xl" @click.stop>
         <template v-if="isLogin">
           <div class="text-center">
             <div class="dark:text-gray-300 font-bold text-[30px] leading-[1.35em]">
@@ -30,14 +24,9 @@
                   <div class="dark:text-gray-300 leading-[1.35em]">
                     教务系统密码
                   </div>
-                  <n-input
-                      type="password"
-                      show-password-on="mousedown"
-                      placeholder="密码"
-                      autosize style="min-width: 50%"
-                      class=""
-                      v-model:value="eduPassword"
-                  />
+                  <n-input type="password" show-password-on="mousedown" placeholder="密码" autosize
+                           style="min-width: 50%"
+                           class="" v-model:value="eduPassword"/>
                 </div>
               </div>
               <div class="mt-4">
@@ -57,57 +46,21 @@
         <template v-else>
           <div class="text-center">
             <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-300 mb-4">登录</h2>
-            <p class="text-gray-600 dark:text-gray-200 text-sm mb-8">使用您的iMember账户</p>
+            <p class="text-gray-600 dark:text-gray-200 text-sm mb-8">使用您的iMember账户进行授权登录</p>
           </div>
 
-          <form @submit.prevent="handleSubmit">
-            <!-- 姓名输入框 -->
-            <div class="mb-6">
-              <label for="name" class="block text-gray-700 dark:text-gray-300 font-medium mb-2">姓名</label>
-              <input
-                  type="text"
-                  id="name"
-                  v-model="form.name"
-                  placeholder="请输入您的姓名"
-                  class="w-full px-4 py-3 rounded-md border border-gray-300 dark:border-transparent dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+          <!-- 跳转到授权页面的按钮 -->
+          <div class="mt-6">
+            <button type="button"
+                    class="w-full bg-blue-500 hover:bg-blue-600 text-white dark:text-gray-300 font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
+                    @click="handleOAuthLogin">
+              授权登录
+            </button>
+          </div>
 
-            <!-- 学号输入框 -->
-            <div class="mb-8">
-              <label for="id" class="block text-gray-700 dark:text-gray-200 font-medium mb-2">学号</label>
-              <input
-                  type="text"
-                  id="id"
-                  v-model="form.id"
-                  placeholder="请输入您的学号"
-                  class="w-full px-4 py-3 rounded-md border border-gray-300 dark:border-transparent dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <!-- 提交按钮 -->
-            <div class="mt-10">
-              <button
-                  type="submit"
-                  class="w-full bg-blue-500 hover:bg-blue-600 text-white dark:text-gray-300 font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
-              >
-                提交
-              </button>
-            </div>
-          </form>
-
-          <!-- 注册链接 -->
-          <div class="mt-8 text-center text-sm">
-            <p class="text-gray-600">
-              还没有账户？
-              <a href="https://www.xauat.site/Signup"
-                 class="text-blue-500 hover:text-blue-700 font-medium inline-flex items-center">
-                立即注册!
-                <Icon class="ml-1 ">
-                  <LinkRound/>
-                </Icon>
-              </a>
-            </p>
+          <!-- 授权说明 -->
+          <div class="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+            <p>点击授权登录后，将跳转到统一身份认证系统进行授权</p>
           </div>
         </template>
       </div>
@@ -116,13 +69,9 @@
 </template>
 
 <script setup>
-import {LinkRound} from '@vicons/material'
-import {Icon} from '@vicons/utils'
-import {reactive, ref} from 'vue'
-import {NSwitch, NInput, NButton} from "naive-ui";
-import {eduLoginService} from '/src/services/EduLoginService.js'
-import { useAuthorizationStore } from '../stores/Login'
-import { LoginService } from '../services/LoginService'
+import {ref} from 'vue'
+import {NButton, NSwitch} from "naive-ui";
+import {useAuthorizationStore} from '../stores/Authorization.ts'
 
 defineProps({
   show: Boolean,
@@ -131,21 +80,22 @@ defineProps({
 const store = useAuthorizationStore();
 const isLogin = ref(store.isAuthenticated);
 
-const isShow = ref(localStorage.getItem('is-show-edu') === 'true')
-const userData = ref(null)
-const eduPassword = ref('')
-eduPassword.value = localStorage.getItem('edu-password') ?? ''
-let userJson = localStorage.getItem('user')
-if (userJson) {
-  userData.value = JSON.parse(userJson)
-}
+// 使用store中的getter获取状态
+const isShow = ref(store.getIsShowEdu);
+const userData = ref(store.getUserData);
+const eduPassword = ref(store.getEduPassword);
 
 const handleChange = (value) => {
-  localStorage.setItem('is-show-edu', value)
+  // 使用store中的action来更新状态
+  store.setIsShowEdu(value);
+  isShow.value = value;
 }
 
 const handleGetData = async () => {
-  await eduLoginService(userData.value.UserId, eduPassword.value)
+  // 先更新store中的密码
+  store.setEduPassword(eduPassword.value);
+  // 使用store中的action来获取教育数据
+  await store.handleGetEduData();
 }
 
 // 登录时
@@ -156,30 +106,10 @@ function closeModal() {
   emit('update:show', false);
 }
 
-const form = reactive({
-  name: '',
-  id: ''
-})
-
-const handleSubmit = async () => {
-  // 这里处理表单提交逻辑
-  console.log('提交表单数据:', form)
-  // 可以在这里添加表单验证和发送请求的逻辑
-  try {
-    const loginResult = await LoginService.login(form.name, form.id);
-    if (loginResult) {
-      // 登录成功，更新 store
-      await store.login({ username: form.name, password: form.id });
-      closeModal();
-    } else {
-      alert('登录失败');
-    }
-  } catch (error) {
-    alert('登录失败: ' + error.message);
-  }
+// 处理OAuth授权登录
+const handleOAuthLogin = () => {
+  window.location.href = 'https://link.xauat.site/api/auth/authorize';
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

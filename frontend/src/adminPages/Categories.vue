@@ -32,53 +32,61 @@
             :class="{ 'animate-spin': loading }" />
         </button>
       </div>
+      <!-- 拖拽提示区域 -->
+      <div class="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center">
+        <Icon icon="ep:info-circle" class="h-3 w-3 mr-1" />
+        拖动卡片可以调整分类顺序
+      </div>
     </div>
 
     <!-- 分类列表 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
+         @dragover.prevent
+         @drop="handleDrop($event, null)">
       <div 
-        v-for="category in filteredCategories" 
-        :key="category.CategoryId" 
-        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all hover:-translate-y-1"
+        v-for="(category, index) in filteredCategories" 
+        :key="category.key"
+        :draggable="true"
+        @dragstart="handleDragStart($event, category)"
+        @dragover.prevent
+        @drop="handleDrop($event, index)"
+        @dragenter="(event: DragEvent) => { if (dragOverIndex !== null) dragOverIndex = index; handleDragEnter(event); }"
+        @dragleave="handleDragLeave($event)"
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all hover:-translate-y-1 cursor-move"
+        :class="{ 'border-primary opacity-70 shadow-md bg-blue-50 dark:bg-blue-900/20': dragOverIndex === index }"
       >
         <div class="flex justify-between items-start mb-4">
           <div 
-            class="w-12 h-12 rounded-xl flex items-center justify-center" 
-            :style="{ backgroundColor: category.Color + '20' }"
+            class="w-12 h-12 rounded-xl flex items-center justify-center bg-gray-100 dark:bg-gray-700"
           >
-            <Icon icon="ep:folder" class="h-6 w-6" :style="{ color: category.Color }" />
+            <IconFont v-if="category.icon" :type="category.icon" class="h-6 w-6 text-primary" />
+            <Icon v-else icon="ep:folder" class="h-6 w-6 text-primary" />
           </div>
           <div class="flex space-x-2">
             <button 
               @click="editCategory(category)" 
               class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               title="编辑"
+              @mousedown.stop
             >
               <Icon icon="ep:edit" class="h-4 w-4" />
             </button>
             <button 
-              @click="deleteCategory(category.CategoryId)" 
+              @click="deleteCategory(category.key)" 
               class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               title="删除"
+              @mousedown.stop
             >
               <Icon icon="ep:delete" class="h-4 w-4" />
             </button>
           </div>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">{{ category.CategoryName }}</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ category.Description || '暂无描述' }}</p>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">{{ category.name }}</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ category.description || '暂无描述' }}</p>
         <div class="flex justify-between items-center">
           <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
-            {{ category.linkCount || 0 }} 个链接
+            {{ category.links?.length || 0 }} 个链接
           </span>
-          <div class="flex items-center space-x-1">
-            <span 
-              class="w-3 h-3 rounded-full" 
-              :style="{ backgroundColor: category.Color }"
-              title="分类颜色"
-            ></span>
-            <span class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ category.Color }}</span>
-          </div>
         </div>
       </div>
     </div>
@@ -121,23 +129,6 @@
           />
         </div>
         <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">分类颜色 <span class="text-danger">*</span></label>
-          <div class="flex items-center space-x-3">
-            <input
-              v-model="form.color"
-              type="color"
-              class="w-10 h-10 rounded-lg border-0 cursor-pointer"
-              title="选择颜色"
-            />
-            <input
-              v-model="form.color"
-              type="text"
-              placeholder="#000000"
-              class="flex-grow rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 py-2.5 px-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-            />
-          </div>
-        </div>
-        <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">分类描述</label>
           <textarea
             v-model="form.description"
@@ -160,28 +151,13 @@
         </button>
         <button 
           @click="saveCategory" 
-          :disabled="saving || !form.name || !form.color"
+          :disabled="saving || !form.name"
           class="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {{ saving ? '保存中...' : '保存' }}
         </button>
       </template>
     </n-modal>
-
-    <!-- 颜色选择器 -->
-    <div class="fixed bottom-4 right-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-3 z-10">
-      <h4 class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">快速颜色</h4>
-      <div class="grid grid-cols-6 gap-2">
-        <button
-          v-for="color in presetColors"
-          :key="color"
-          @click="selectPresetColor(color)"
-          class="w-6 h-6 rounded-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50"
-          :style="{ backgroundColor: color }"
-          :title="color"
-        ></button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -190,8 +166,9 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useMessage } from 'naive-ui'
 import { NSpin, NModal } from 'naive-ui'
 import { Icon } from '@iconify/vue'
+import IconFont from '../components/IconFont.vue'
 import { CategoryService } from '../services/CategoryService'
-import type { CategoryModel } from '../models/category'
+import {type CategoryModel} from '../models/category'
 
 // 消息提示
 const message = useMessage()
@@ -201,6 +178,12 @@ const loading = ref(false)
 const saving = ref(false)
 const showModal = ref(false)
 const editingId = ref<string | null>(null)
+
+// 拖拽相关状态
+const dragOverIndex = ref<number | null>(null)
+const draggedItem = ref<any>(null)
+const isDragging = ref(false)
+const sortTimeout = ref<number | null>(null)
 
 // 计算属性用于处理v-model
 const isModalVisible = computed({
@@ -217,29 +200,12 @@ const isModalVisible = computed({
 // 搜索
 const searchQuery = ref('')
 
-// 预设颜色
-const presetColors = [
-  '#0071e3', // 蓝色
-  '#34c759', // 绿色
-  '#ff9500', // 橙色
-  '#ff3b30', // 红色
-  '#5856d6', // 紫色
-  '#af52de', // 粉色
-  '#ff2d55', // 玫瑰红
-  '#5ac8fa', // 浅蓝
-  '#ffcc00', // 黄色
-  '#00c7be', // 青色
-  '#a2845e', // 棕色
-  '#8e8e93'  // 灰色
-]
-
 // 数据
-const categories = ref<any[]>([])
+const categories = ref<CategoryModel[]>([])
 
 // 表单数据
 const form = reactive({
   name: '',
-  color: '#0071e3',
   description: ''
 })
 
@@ -249,16 +215,103 @@ const filteredCategories = computed(() => {
   
   const query = searchQuery.value.toLowerCase()
   return categories.value.filter(category => 
-    category.CategoryName.toLowerCase().includes(query) ||
-    (category.Description && category.Description.toLowerCase().includes(query))
+    (category.name && category.name.toLowerCase().includes(query)) ||
+    (category.description && category.description.toLowerCase().includes(query))
   )
 })
+
+// 拖拽相关方法
+const handleDragStart = (event: DragEvent, category: CategoryModel) => {
+  isDragging.value = true
+  draggedItem.value = category
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', '') // 必须设置数据才能正常拖拽
+  }
+}
+
+const handleDragEnter = (event: DragEvent) => {
+  event.preventDefault()
+}
+
+const handleDragLeave = (event: DragEvent) => {
+  event.preventDefault()
+  // 修复拖拽离开判断逻辑
+  setTimeout(() => {
+    dragOverIndex.value = null
+  }, 0)
+}
+
+const handleDrop = (event: DragEvent, dropIndex: number | null) => {
+  event.preventDefault()
+  
+  if (!isDragging.value || dropIndex === null || !draggedItem.value) {
+    dragOverIndex.value = null
+    return
+  }
+  
+  const dragIndex = categories.value.findIndex(cat => 
+    cat.key === draggedItem.value.key
+  )
+  
+  if (dragIndex !== -1 && dragIndex !== dropIndex) {
+    // 更新本地数组顺序
+    const newCategories = [...categories.value]
+    const [removed] = newCategories.splice(dragIndex, 1)
+    newCategories.splice(dropIndex, 0, removed)
+    categories.value = newCategories
+    
+    // 添加视觉反馈
+    const dropElement = event.target as HTMLElement
+    if (dropElement) {
+      dropElement.classList.add('animate-pulse')
+      setTimeout(() => {
+        dropElement.classList.remove('animate-pulse')
+      }, 300)
+    }
+    
+    // 延迟保存以避免频繁请求
+    if (sortTimeout.value) {
+      clearTimeout(sortTimeout.value)
+    }
+    
+    sortTimeout.value = window.setTimeout(async () => {
+      await saveCategoryOrder()
+    }, 500)
+  }
+  
+  dragOverIndex.value = null
+  isDragging.value = false
+  draggedItem.value = null
+}
+
+const saveCategoryOrder = async () => {
+  try {
+    const categoryIds = categories.value.map(cat => cat.key)
+    await CategoryService.updateCategorySort(categoryIds)
+    message.success('分类顺序已更新')
+  } catch (error) {
+    message.error('更新分类顺序失败')
+    console.error('更新分类顺序失败:', error)
+    // 重新加载数据以恢复原始顺序
+    await loadCategories()
+  }
+}
 
 // 方法
 const loadCategories = async () => {
   try {
     loading.value = true
-    categories.value = await CategoryService.getAllCategories()
+    const data = await CategoryService.getAllCategories()
+    // 标准化数据格式，确保所有对象都使用一致的属性名
+    categories.value = data.map((item: any) => ({
+      key: item.key || item.CategoryId || '',
+      name: item.name || item.CategoryName || '',
+      description: item.description || item.Description || '',
+      icon: 'folder-o',
+      index: 0,
+      links: item.links || []
+    }))
   } catch (error) {
     message.error('加载分类失败')
     console.error('加载分类失败:', error)
@@ -269,7 +322,6 @@ const loadCategories = async () => {
 
 const resetForm = () => {
   form.name = ''
-  form.color = '#0071e3'
   form.description = ''
   editingId.value = null
 }
@@ -278,47 +330,38 @@ const closeModal = () => {
   showModal.value = false
 }
 
-const editCategory = (category: any) => {
-  editingId.value = category.CategoryId
-  form.name = category.CategoryName
-  form.color = category.Color || '#0071e3'
-  form.description = category.Description || ''
+const editCategory = (category: CategoryModel) => {
+  editingId.value = category.key
+  form.name = category.name || ''
+  form.description = category.description || ''
   showModal.value = true
 }
 
 const saveCategory = async () => {
-  if (!form.name || !form.color) {
-    message.warning('请填写分类名称和颜色')
+  if (!form.name) {
+    message.warning('请填写分类名称')
     return
   }
   
   try {
     saving.value = true
     
+    // 准备分类数据，确保类型安全
+    const categoryData: CategoryModel = {
+      key: editingId.value || '',
+      name: form.name,
+      description: form.description,
+      icon: 'folder-o',
+      index: 0,
+      links: []
+    }
+    
     if (editingId.value) {
-      // 编辑模式
-      // 转换为CategoryModel格式
-      const categoryData: CategoryModel = {
-        key: editingId.value,
-        name: form.name,
-        description: form.description,
-        icon: '',
-        index: 0,
-        links: []
-      };
+      // 编辑模式 - 使用正确的参数格式
       await CategoryService.updateCategory(categoryData)
       message.success('更新成功')
     } else {
       // 创建模式
-      // 转换为CategoryModel格式
-      const categoryData: CategoryModel = {
-        key: '',
-        name: form.name,
-        description: form.description,
-        icon: '',
-        index: 0,
-        links: []
-      };
       await CategoryService.createCategory(categoryData)
       message.success('创建成功')
     }
@@ -335,12 +378,13 @@ const saveCategory = async () => {
 
 const deleteCategory = async (id: string) => {
   // 检查是否有链接使用此分类
-  const category = categories.value.find(cat => cat.CategoryId === id)
-  if (category && category.linkCount > 0) {
-    message.warning(`此分类下有 ${category.linkCount} 个链接，请先移除这些链接后再删除分类`)
+  const category = categories.value.find(cat => cat.key === id)
+  if (category && (category.links?.length || 0) > 0) {
+    message.warning(`此分类下有 ${category.links.length} 个链接，请先移除这些链接后再删除分类`)
     return
   }
   
+  // 使用原生confirm对话框确认删除
   if (confirm('确定要删除这个分类吗？')) {
     try {
       await CategoryService.deleteCategory(id)
@@ -351,10 +395,6 @@ const deleteCategory = async (id: string) => {
       console.error('删除分类失败:', error)
     }
   }
-}
-
-const selectPresetColor = (color: string) => {
-  form.color = color
 }
 
 // 生命周期
@@ -377,6 +417,7 @@ onMounted(async () => {
 /* 自定义滚动条 */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -386,10 +427,33 @@ onMounted(async () => {
 ::-webkit-scrollbar-thumb {
   background: #cbd5e0;
   border-radius: 4px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
 }
 
 .dark ::-webkit-scrollbar-thumb {
   background: #4a5568;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
+
+/* 拖拽状态样式 */
+.cursor-move {
+  transition: all 0.2s ease;
+}
+
+.cursor-move:active {
+  cursor: grabbing;
+}
+
+/* 暗黑模式优化 */
+.dark .bg-blue-900\/20 {
+  background-color: rgba(30, 64, 175, 0.2);
 }
 
 /* 响应式调整 */
@@ -397,5 +461,34 @@ onMounted(async () => {
   .grid {
     grid-template-columns: 1fr;
   }
+  
+  .p-6 {
+    padding: 1.25rem;
+  }
+  
+  .w-12.h-12 {
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  .h-6.w-6 {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 按钮交互效果增强 */
+button {
+  transition: all 0.15s ease;
+}
+
+button:active {
+  transform: scale(0.95);
 }
 </style>

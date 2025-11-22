@@ -183,16 +183,16 @@
   <LoginCard v-model:show="isOpenLogin"/>
 </template>
 
-<script setup>
-import {onMounted, onUnmounted, ref,h} from 'vue'
+<script setup lang="ts">
+import {h, onMounted, onUnmounted, ref, watch} from 'vue'
 import AccountCard from "./AccountCard.vue";
 import SettingCard from "./SettingCard.vue";
-import LocalStorageHelper from '../lib/localStorageHelper.ts'
 import LoginCard from "./LoginCard.vue";
 import {Settings16Filled} from '@vicons/fluent'
 import {AccountCircleRound} from '@vicons/material'
 import {Icon} from '@vicons/utils'
 import {NDropdown} from 'naive-ui'
+import {useSearchEngineStore} from '../stores/SearchEngineStore'
 
 defineProps({
   isShowSetting: {
@@ -241,6 +241,7 @@ const suggestions = ref([])
 const selectedSuggestionIndex = ref(-1)
 const isSticky = ref(false);
 const originalNav = ref(null);
+const searchEngineStore = useSearchEngineStore()
 const currentEngine = ref(searchEngines[0])
 const isOpenSuggestions = ref(false)
 const isOpenSetting = ref(false)
@@ -248,8 +249,13 @@ const isOpenAccount = ref(false)
 const isShowEngines = ref(false)
 const isOpenLogin = ref(false)
 
-const num = parseInt(LocalStorageHelper.get('engine_num') ?? '0')
-currentEngine.value = searchEngines[isNaN(num) ? 0 : num]
+// Watch for changes in the store
+watch(() => searchEngineStore.currentEngineKey, (newKey) => {
+  const engine = searchEngines.find(item => item.key === newKey)
+  if (engine) {
+    currentEngine.value = engine
+  }
+})
 
 const updateTime = function () {
   const now = new Date();
@@ -260,22 +266,21 @@ const updateTime = function () {
   time.value = `${hours}:${minutes}`;
 };
 
-
-const selectEngine = (key) => {
-  const engine = searchEngines.find(item => item.key === key)
-  currentEngine.value = engine
-  showEngines.value = false
-
-  LocalStorageHelper.set('engine_num', parseInt(engine.key) - 1)
+// Initialize current engine from store
+const initializeCurrentEngine = () => {
+  searchEngineStore.initCurrentEngine()
+  const engine = searchEngines.find(item => item.key === searchEngineStore.currentEngineKey)
+  if (engine) {
+    currentEngine.value = engine
+  }
 }
 
-const engineClick = () => {
-  showEngines.value = !showEngines.value;
-  firstShowEngines.value = false;
-
-  setTimeout(() => {
-    isShowEngines.value = showEngines.value
-  }, showEngines.value ? 0 : 300)
+const selectEngine = (key) => {
+  currentEngine.value = searchEngines.find(item => item.key === key)
+  showEngines.value = false
+  
+  // Use store instead of LocalStorageHelper
+  searchEngineStore.setCurrentEngine(key)
 }
 
 const search = async () => {
@@ -288,7 +293,7 @@ const search = async () => {
   }
 
   if (searchQuery.value.trim()) {
-    const searchUrl = engineLink[parseInt(currentEngine.value.key) - 1] + encodeURIComponent(suggestions.value[selectedSuggestionIndex.value])
+    const searchUrl = engineLink[parseInt(currentEngine.value.key) - 1] + encodeURIComponent(searchQuery.value)
     window.open(searchUrl)
   }
 }
@@ -355,6 +360,7 @@ const hide = () => {
 
 // 添加和移除滚动事件监听
 onMounted(() => {
+  initializeCurrentEngine()
   window.addEventListener('scroll', handleScroll);
   updateTime();
   // 每分钟更新一次时间

@@ -11,21 +11,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed } from 'vue'
-import { NMessageProvider, NDialogProvider, NConfigProvider, darkTheme } from 'naive-ui'
-import Layout from './components/Layout.vue'
+import {onMounted, onUnmounted, ref, computed} from 'vue'
+import {NMessageProvider, NDialogProvider, NConfigProvider, darkTheme} from 'naive-ui'
 
 // 从localStorage获取主题偏好，如果没有则跟随系统
 const savedTheme = localStorage.getItem('theme')
 let isDark = ref(savedTheme === 'dark' || (savedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches))
 const theme = computed(() => (isDark.value ? darkTheme : null))
-
-// 切换主题
-const toggleTheme = () => {
-  isDark.value = !isDark.value
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-  document.documentElement.classList.toggle('dark', isDark.value)
-}
 
 // 系统主题变化监听
 let mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')

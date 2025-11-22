@@ -2,14 +2,8 @@
 export interface UserModel {
   userName: string;
   userId: string;
-  gender: string;
   className: string;
   identity: string;
-}
-
-export interface LoginModel {
-  name: string;
-  id: string;
 }
 
 // 密码更新模型
