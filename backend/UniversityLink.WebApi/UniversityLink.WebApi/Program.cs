@@ -31,8 +31,8 @@ builder.Services.AddAuthentication(options =>
         {
             ValidateIssuer = false,
             ValidateAudience = false,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = false,
+            ValidateLifetime = false, // 对于外部OAuth令牌，可能需要特殊处理
+            ValidateIssuerSigningKey = false, // 对于外部OAuth令牌，可能没有我们期望的签名密钥
         };
 
         // 允许处理 OAuth2 不透明令牌
@@ -49,8 +49,21 @@ builder.Services.AddAuthentication(options =>
 
                 return Task.CompletedTask;
             },
-            OnAuthenticationFailed = _ => Task.CompletedTask,
-            OnChallenge = _ => Task.CompletedTask
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine($"Authentication failed: {context.Exception}");
+                return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                Console.WriteLine($"Challenge: {context.AuthenticateFailure?.Message}");
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = _ =>
+            {
+                Console.WriteLine("Token validated successfully:");
+                return Task.CompletedTask;
+            }
         };
     });
 
