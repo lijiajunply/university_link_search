@@ -1,19 +1,23 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication;
 using NpgsqlDataProtection;
 using Scalar.AspNetCore;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using Microsoft.AspNetCore.Authentication;
 using UniversityLink.Data;
 using UniversityLink.DataApi.Repositories;
 using UniversityLink.DataApi.Services;
 using UniversityLink.WebApi;
 using UniversityLink.WebApi.Controllers;
-using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +37,12 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
 });
+
+// 增强数据保护配置
+builder.Services.AddDataProtection()
+    .SetApplicationName("UniversityLink") // 确保应用名称一致
+    .PersistKeysToFileSystem(new DirectoryInfo("./keys")) // 确保密钥持久化
+    .SetDefaultKeyLifetime(TimeSpan.FromDays(90)); // 设置合理的密钥生命周期
 
 // 配置 OAuth2
 builder.Services.AddAuthentication(options =>
@@ -57,6 +67,10 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("read");
 
         options.SaveTokens = true;
+        options.StateDataFormat = new PropertiesDataFormat(
+            DataProtectionProvider.Create("UniversityLink.StateData")
+                .CreateProtector("Microsoft.AspNetCore.Authentication.OAuth.OAuthHandler<AuthenticationSchemeOptions>",
+                    "ExternalOAuth", "v1"));
 
         options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
         options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
@@ -88,8 +102,12 @@ builder.Services.AddAuthentication(options =>
         options.Cookie.Name = ".UniversityLink.TempAuth";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(5); // 短期有效
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        // 根据环境设置Cookie的安全策略
+        options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() ? 
+            CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
+        // 确保Cookie数据保护配置正确
+        options.CookieManager = new ChunkingCookieManager();
     })
     .AddScheme<AuthenticationSchemeOptions, ExternalBearerHandler>("ExternalBearer", null)
     .AddJwtBearer("InternalJWT", options =>
@@ -191,8 +209,33 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// 确保在认证之前设置正确的主机和路径基础
+app.Use((context, next) =>
+{
+    var forwardedHost = context.Request.Headers["X-Forwarded-Host"].FirstOrDefault();
+    var forwardedProto = context.Request.Headers["X-Forwarded-Proto"].FirstOrDefault();
+    
+    if (!string.IsNullOrEmpty(forwardedHost))
+    {
+        context.Request.Host = new HostString(forwardedHost);
+    }
+    
+    if (!string.IsNullOrEmpty(forwardedProto))
+    {
+        context.Request.Scheme = forwardedProto;
+    }
+    
+    return next();
+});
+
 // Use Forwarded Headers Middleware
 app.UseForwardedHeaders();
+
+// 确保使用HTTPS重定向（生产环境）
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 using (var scope = app.Services.CreateScope())
 {
