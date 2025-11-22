@@ -38,6 +38,7 @@ builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = "ExternalBearer";
         options.DefaultChallengeScheme = "ExternalOAuth";
+        options.DefaultSignInScheme = "ExternalOAuth"; // 添加这行来解决错误
     })
     .AddOAuth("ExternalOAuth", options =>
     {
