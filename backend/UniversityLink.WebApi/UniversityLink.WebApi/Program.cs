@@ -38,18 +38,12 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
-// 增强数据保护配置
-builder.Services.AddDataProtection()
-    .SetApplicationName("UniversityLink") // 确保应用名称一致
-    .PersistKeysToFileSystem(new DirectoryInfo("./keys")) // 确保密钥持久化
-    .SetDefaultKeyLifetime(TimeSpan.FromDays(90)); // 设置合理的密钥生命周期
-
 // 配置 OAuth2
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = "ExternalBearer";
         options.DefaultChallengeScheme = "ExternalOAuth";
-        options.DefaultSignInScheme = "TempCookie";
+        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     })
     .AddOAuth("ExternalOAuth", options =>
     {
@@ -97,18 +91,7 @@ builder.Services.AddAuthentication(options =>
             context.RunClaimActions(json.RootElement);
         };
     })
-    .AddCookie("TempCookie", options =>
-    {
-        options.Cookie.Name = ".UniversityLink.TempAuth";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(5); // 短期有效
-        options.Cookie.HttpOnly = true;
-        // 根据环境设置Cookie的安全策略
-        options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() ? 
-            CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Lax;
-        // 确保Cookie数据保护配置正确
-        options.CookieManager = new ChunkingCookieManager();
-    })
+    .AddCookie()
     .AddScheme<AuthenticationSchemeOptions, ExternalBearerHandler>("ExternalBearer", null)
     .AddJwtBearer("InternalJWT", options =>
     {
@@ -230,12 +213,6 @@ app.Use((context, next) =>
 
 // Use Forwarded Headers Middleware
 app.UseForwardedHeaders();
-
-// 确保使用HTTPS重定向（生产环境）
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
 
 using (var scope = app.Services.CreateScope())
 {
