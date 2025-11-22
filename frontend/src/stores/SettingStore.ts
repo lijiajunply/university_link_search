@@ -10,14 +10,6 @@ export const useSettingStore = defineStore('setting', {
     user: null as any,
     todos: [] as any[],
     clipboards: [] as string[],
-    newTodo: {
-      title: '',
-      status: false,
-      description: '',
-      startTime: '',
-      endTime: '',
-    },
-    newClipboard: ''
   }),
   
   getters: {
@@ -72,7 +64,6 @@ export const useSettingStore = defineStore('setting', {
     
     addClipboard(text: string) {
       this.clipboards.push(text)
-      this.newClipboard = ''
       this.saveUser()
     },
     

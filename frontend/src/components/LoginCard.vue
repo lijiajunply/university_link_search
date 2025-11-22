@@ -70,7 +70,7 @@
 
 <script setup>
 import {ref} from 'vue'
-import {NButton, NSwitch} from "naive-ui";
+import {NButton, NSwitch, NInput} from "naive-ui";
 import {useAuthorizationStore} from '../stores/Authorization.ts'
 
 defineProps({
