@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication;
@@ -16,7 +13,6 @@ using System.Text.Json;
 using UniversityLink.Data;
 using UniversityLink.DataApi.Repositories;
 using UniversityLink.DataApi.Services;
-using UniversityLink.WebApi;
 using UniversityLink.WebApi.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,15 +37,15 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 // 配置 OAuth2
 builder.Services.AddAuthentication(options =>
     {
-        options.DefaultAuthenticateScheme = "ExternalBearer";
-        options.DefaultChallengeScheme = "ExternalOAuth";
+        options.DefaultAuthenticateScheme = "InternalJWT";
+        options.DefaultChallengeScheme = "InternalJWT";
         options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     })
     .AddOAuth("ExternalOAuth", options =>
     {
         options.ClientId = Environment.GetEnvironmentVariable("OAUTH_CLIENT_ID") ?? "your-client-id";
         options.ClientSecret = Environment.GetEnvironmentVariable("OAUTH_CLIENT_SECRET") ?? "your-client-secret";
-        options.CallbackPath = "/auth/callback";
+        options.CallbackPath = "/signin-oauth"; // 修改这里，避免与 Controller 冲突
 
         options.AuthorizationEndpoint = "https://api.xauat.site/SSO/authorize";
         options.TokenEndpoint = "https://api.xauat.site/SSO/token";
@@ -103,7 +99,6 @@ builder.Services.AddAuthentication(options =>
         };
     })
     .AddCookie()
-    .AddScheme<AuthenticationSchemeOptions, ExternalBearerHandler>("ExternalBearer", null)
     .AddJwtBearer("InternalJWT", options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -202,25 +197,6 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
-// 确保在认证之前设置正确的主机和路径基础
-app.Use((context, next) =>
-{
-    var forwardedHost = context.Request.Headers["X-Forwarded-Host"].FirstOrDefault();
-    var forwardedProto = context.Request.Headers["X-Forwarded-Proto"].FirstOrDefault();
-    
-    if (!string.IsNullOrEmpty(forwardedHost))
-    {
-        context.Request.Host = new HostString(forwardedHost);
-    }
-    
-    if (!string.IsNullOrEmpty(forwardedProto))
-    {
-        context.Request.Scheme = forwardedProto;
-    }
-    
-    return next();
-});
 
 // Use Forwarded Headers Middleware
 app.UseForwardedHeaders();
