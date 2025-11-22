@@ -64,6 +64,14 @@
           </div>
           <div class="flex space-x-2">
             <button 
+              @click="showCategoryDetail(category)" 
+              class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              title="查看详情"
+              @mousedown.stop
+            >
+              <Icon icon="ep:eye" class="h-4 w-4" />
+            </button>
+            <button 
               @click="editCategory(category)" 
               class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               title="编辑"
@@ -169,6 +177,10 @@ import { Icon } from '@iconify/vue'
 import IconFont from '../components/IconFont.vue'
 import { CategoryService } from '../services/CategoryService'
 import {type CategoryModel} from '../models/category'
+import { useRouter } from 'vue-router'
+
+// 路由
+const router = useRouter()
 
 // 消息提示
 const message = useMessage()
@@ -336,6 +348,12 @@ const editCategory = (category: CategoryModel) => {
   form.name = category.name || ''
   form.description = category.description || ''
   showModal.value = true
+}
+
+const showCategoryDetail = (category: CategoryModel) => {
+  router.push({
+    path: '/category/' + category.key,
+  })
 }
 
 const saveCategory = async () => {

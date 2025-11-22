@@ -13,7 +13,7 @@ const routes = [
         component: () => import('./pages/Callback.vue'),
     },
     {
-        path: '/admin',
+        path: '',
         name: "Centre",
         component: () => import('./layouts/CentreLayout.vue'),
         children: [

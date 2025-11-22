@@ -22,7 +22,7 @@
                 {{ item.label }}
                 <!-- 苹果风格下划线指示器 -->
                 <span v-if="isActiveRoute(item.path)"
-                  class="absolute bottom-[-6px] left-0 right-0 h-0.5 bg-blue-500 dark:bg-blue-400 rounded-full transition-all duration-300"></span>
+                  class="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-blue-500 dark:bg-blue-400 rounded-full transition-all duration-300"></span>
               </router-link>
             </nav>
 
@@ -30,7 +30,7 @@
 
             <!-- 移动端菜单按钮 - 适配不同尺寸的触摸目标 -->
             <button @click="mobileMenuOpen = !mobileMenuOpen"
-              class="md:hidden p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              class="md:hidden p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-w-11 min-h-11 flex items-center justify-center"
               aria-label="菜单">
               <Icon :icon="mobileMenuOpen ? 'mdi:close' : 'mdi:menu'" class="h-6 w-6 text-gray-700" />
             </button>
@@ -47,7 +47,7 @@
               class="px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 transition-all duration-200 flex items-center gap-3"
               :class="{ 'bg-gray-50 text-blue-500': isActiveRoute(item.path) }" @click="mobileMenuOpen = false">
               <!-- 移动端导航图标 - 苹果风格 -->
-              <Icon :icon="getAppleStyleIcon(item.path)" class="h-6 w-6 flex-shrink-0" />
+              <Icon :icon="getAppleStyleIcon(item.path)" class="h-6 w-6 shrink-0" />
               {{ item.label }}
             </router-link>
           </nav>
