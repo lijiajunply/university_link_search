@@ -45,7 +45,6 @@ builder.Services.AddAuthentication(options =>
     {
         options.ClientId = Environment.GetEnvironmentVariable("OAUTH_CLIENT_ID") ?? "your-client-id";
         options.ClientSecret = Environment.GetEnvironmentVariable("OAUTH_CLIENT_SECRET") ?? "your-client-secret";
-        options.CallbackPath = "/signin-oauth"; // 修改这里，避免与 Controller 冲突
 
         options.AuthorizationEndpoint = "https://api.xauat.site/SSO/authorize";
         options.TokenEndpoint = "https://api.xauat.site/SSO/token";
