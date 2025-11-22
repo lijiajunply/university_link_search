@@ -19,7 +19,7 @@ public class AuthController(IUserService userService, IJwtGenerate generate) : C
         {
             var properties = new AuthenticationProperties
             {
-                RedirectUri = Url.Action("LoginLogic") // 生成 /Auth/LoginLogic
+                RedirectUri = Url.Action("LoginSuccess") // 生成 /Auth/LoginLogic
             };
 
             // 使用OAuth中间件处理授权
@@ -31,9 +31,9 @@ public class AuthController(IUserService userService, IJwtGenerate generate) : C
         }
     }
 
-    // GET: api/auth/callback
-    [HttpGet("LoginLogic")]
-    public async Task<IActionResult> LoginLogic(CancellationToken cancellationToken = default)
+    // GET: api/auth/LoginSuccess
+    [HttpGet("LoginSuccess")]
+    public async Task<IActionResult> LoginSuccess(CancellationToken cancellationToken = default)
     {
         try
         {

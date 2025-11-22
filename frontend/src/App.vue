@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'dark': isDark }">
-    <n-config-provider :theme="theme">
+    <n-config-provider :theme="theme" :locale="zhCN">
       <n-dialog-provider>
         <n-message-provider>
           <router-view/>
@@ -13,6 +13,7 @@
 <script setup lang="ts">
 import {onMounted, onUnmounted, ref, computed} from 'vue'
 import {NMessageProvider, NDialogProvider, NConfigProvider, darkTheme} from 'naive-ui'
+import { zhCN } from 'naive-ui';
 
 // 从localStorage获取主题偏好，如果没有则跟随系统
 const savedTheme = localStorage.getItem('theme')

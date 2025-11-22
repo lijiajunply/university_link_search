@@ -258,6 +258,7 @@ const handleDrop = (event: DragEvent, dropIndex: number | null) => {
     // 更新本地数组顺序
     const newCategories = [...categories.value]
     const [removed] = newCategories.splice(dragIndex, 1)
+    if(removed === undefined) return
     newCategories.splice(dropIndex, 0, removed)
     categories.value = newCategories
     

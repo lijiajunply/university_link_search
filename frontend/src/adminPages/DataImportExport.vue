@@ -591,9 +591,9 @@ const triggerFileUpload = () => {
 const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
-    selectedFile.value = target.files[0]
+    selectedFile.value = target.files[0]!
     // 验证文件格式
-    const file = target.files[0]
+    const file = target.files[0]!
     const isJsonFile = file.type === 'application/json' || file.name.endsWith('.json')
     const isFileSizeValid = file.size <= 10 * 1024 * 1024
     isValidJsonFile.value = isJsonFile && isFileSizeValid

@@ -260,7 +260,7 @@ import type { LinkModel } from '../models/link';
 // 路由
 const route = useRoute();
 const router = useRouter();
-const categoryId = ref<string>(route.params.id.toString() || '');
+const categoryId = ref<string>(route.params.id?.toString() || '');
 
 // LinkModel已经定义了完整的链接类型，包含index字段
 
@@ -496,11 +496,12 @@ const updateLink = async () => {
     if (index !== -1) {
       // 确保更新后的对象符合LinkModel类型
       const updatedLink: LinkModel = {
-        ...category.value.links[index],
         name: editingLink.name.trim(),
         url: editingLink.url.trim(),
-        icon: editingLink.icon?.trim(),
-        description: editingLink.description?.trim()
+        icon: editingLink.icon?.trim() || '',
+        description: editingLink.description?.trim() || '',
+        key: editingLink.key || '',
+        index: index
       };
       category.value.links[index] = updatedLink;
     }
@@ -594,6 +595,8 @@ const handleDrop = async (event: DragEvent, targetLink: LinkModel) => {
     
     // 移除被拖拽的元素
     const [removed] = links.splice(draggedIndex, 1);
+
+    if(removed === undefined) return;
     // 插入到新位置
     links.splice(targetIndex, 0, removed);
     
