@@ -13,7 +13,7 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div class="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 p-4">
+  <div class="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 p-4">
     <NCard 
       class="w-full max-w-md backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl"
       :bordered="false"

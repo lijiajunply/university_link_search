@@ -6,10 +6,6 @@
       <div class="container mx-auto px-4 py-3 flex items-center justify-between">
         <!-- 左侧Logo和标题 -->
         <div class="flex items-center gap-2">
-          <div
-              class="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-            <Icon icon="mdi:link-variant" class="text-white"/>
-          </div>
           <h1 class="text-xl font-semibold text-gray-900 dark:text-white">建大导航</h1>
         </div>
 
@@ -76,7 +72,6 @@ const route = useRoute();
 // 导航项 - 根据router.ts中的路由配置动态生成
 const navItems = [
   {path: '/', label: '首页'},
-  {path: '/links', label: '链接管理'},
   {path: '/categories', label: '分类管理'},
   {path: '/users', label: '用户管理'},
   {path: '/data', label: '数据管理'}

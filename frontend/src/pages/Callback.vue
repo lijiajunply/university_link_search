@@ -16,6 +16,8 @@ onMounted(() => {
     role: route.query.role as string || '',
   } as ClubData
 
+  console.log(data)
+
   authorizationStore.setClubData(data)
 
   router.push('/')

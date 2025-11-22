@@ -139,14 +139,14 @@ onMounted(async () => {
     <!-- 搜索栏 -->
     <SearchBar :is-show-setting="isRightMenuVisible" ref="searchRef"/>
 
-    <div class="mx-auto px-8 md:px-16 pt-8 z-[-10]">
+    <div class="mx-auto px-8 md:px-16 pt-8 -z-10">
       <TilesCard class="opacity-0 animate-fade-in"
                  :style="{ animationDelay: `${0.1}s`}"/>
     </div>
 
     <template v-if="categories.length > 0">
       <!-- 网站分类卡片 -->
-      <div class="mx-auto px-8 md:px-16 pt-8 z-[-10]">
+      <div class="mx-auto px-8 md:px-16 pt-8 -z-10">
         <div :class="[
                 'grid grid-cols-8 gap-6 md:gap-8']">
           <div

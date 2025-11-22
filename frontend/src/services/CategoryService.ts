@@ -3,7 +3,7 @@ import type { CategoryModel } from "../models/category";
 
 // 通用请求方法，处理认证头
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem('Authorization');
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...options.headers as Record<string, string>,
