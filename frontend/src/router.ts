@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
-        path: "/",
+        path: "",
         name: 'Home',
         meta: { title: "建大导航 - 起始页" },
         component: () => import('./pages/Home.vue'),
@@ -13,30 +13,30 @@ const routes = [
         component: () => import('./pages/Callback.vue'),
     },
     {
-        path: '',
+        path: '/',
         name: "Centre",
         component: () => import('./layouts/CentreLayout.vue'),
         children: [
             {
-                path: '/users',
+                path: 'users',
                 name: 'Users',
                 meta: { title: "用户管理" },
                 component: () => import('./adminPages/Users.vue'),
             },
             {
-                path: '/categories',
+                path: 'categories',
                 name: 'Categories',
                 meta: { title: "分类管理" },
                 component: () => import('./adminPages/Categories.vue'),
             },
             {
-                path: '/data',
+                path: 'data',
                 name: 'Data',
                 meta: { title: "数据管理" },
                 component: () => import('./adminPages/DataImportExport.vue'),
             },
             {
-                path: '/category/:id',
+                path: 'category/:id',
                 name: 'Category',
                 meta: { title: "链接分类管理" },
                 component: () => import('./adminPages/Category.vue'),

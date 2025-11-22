@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-[--bg-primary] transition-colors duration-300">
+  <div class="min-h-screen flex flex-col transition-colors duration-300">
     <!-- 顶部导航栏 - 苹果风格毛玻璃效果 -->
     <header
       class="sticky top-0 z-50 backdrop-blur-2xl bg-[--glass-bg] border-b border-[--border-primary] transition-all duration-300">
@@ -171,43 +171,6 @@ const isActiveRoute = (path: string): boolean => {
 </script>
 
 <style scoped>
-/* CSS 变量 - 支持亮色和暗色模式 */
-:root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --border-primary: rgba(0, 0, 0, 0.08);
-  --hover-bg: rgba(0, 0, 0, 0.04);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary: #000000;
-    --bg-secondary: #0a0a0a;
-    --glass-bg: rgba(0, 0, 0, 0.7);
-    --text-primary: #f9fafb;
-    --text-secondary: #9ca3af;
-    --text-tertiary: #6b7280;
-    --border-primary: rgba(255, 255, 255, 0.1);
-    --hover-bg: rgba(255, 255, 255, 0.06);
-  }
-}
-
-/* 如果使用类名切换暗色模式 */
-:global(.dark) {
-  --bg-primary: #000000;
-  --bg-secondary: #0a0a0a;
-  --glass-bg: rgba(0, 0, 0, 0.7);
-  --text-primary: #f9fafb;
-  --text-secondary: #9ca3af;
-  --text-tertiary: #6b7280;
-  --border-primary: rgba(255, 255, 255, 0.1);
-  --hover-bg: rgba(255, 255, 255, 0.06);
-}
-
 /* 自定义滚动条 - 苹果风格 */
 :deep(*::-webkit-scrollbar) {
   width: 8px;
