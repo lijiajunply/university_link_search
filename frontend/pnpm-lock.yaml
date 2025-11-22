@@ -14,6 +14,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.17
         version: 4.1.17(vite@7.2.4(jiti@2.6.1)(lightningcss@1.30.2))
+      '@types/pako':
+        specifier: ^2.0.4
+        version: 2.0.4
       echarts:
         specifier: ^6.0.0
         version: 6.0.0
@@ -496,6 +499,9 @@ packages:
 
   '@types/node@14.14.45':
     resolution: {integrity: sha512-DssMqTV9UnnoxDWu959sDLZzfvqCF0qDNRjaWeYSui9xkFe61kKo4l1TWNTQONpuXEm+gLMRvdlzvNHBamzmEw==}
+
+  '@types/pako@2.0.4':
+    resolution: {integrity: sha512-VWDCbrLeVXJM9fihYodcLiIv0ku+AlOa/TQ1SvYOaBuyrSKgEcro95LJyIsJ4vSo6BXIxOKxiJAat04CmST9Fw==}
 
   '@vicons/fluent@0.13.0':
     resolution: {integrity: sha512-bYGZsOE3qzvm3Cm43e7tybgGlr5ZUpYqtRZq0g0Tfupe8jIzLolpvQLNUt1zS8Mgt6goTbUk5YH7Fkv16jkykg==}
@@ -1280,6 +1286,8 @@ snapshots:
   '@types/lodash@4.17.20': {}
 
   '@types/node@14.14.45': {}
+
+  '@types/pako@2.0.4': {}
 
   '@vicons/fluent@0.13.0': {}
 

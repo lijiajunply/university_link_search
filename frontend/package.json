@@ -11,6 +11,7 @@
   "dependencies": {
     "@iconify/vue": "^5.0.0",
     "@tailwindcss/vite": "^4.1.17",
+    "@types/pako": "^2.0.4",
     "echarts": "^6.0.0",
     "pinia": "^3.0.4",
     "qrcode": "^1.5.4",

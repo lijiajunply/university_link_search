@@ -1,6 +1,6 @@
 <template>
   <!-- 原始组件 -->
-  <div ref="originalNav" class="pt-12 pb-8 z-[9999]">
+  <div ref="originalNav" class="pt-12 pb-8 z-9999">
     <div class="container mx-auto">
       <div class="grid grid-cols-3 gap-4 mt-8">
         <div></div>
@@ -48,11 +48,11 @@
 
       <div class="mx-8 md:mx-auto mt-8 md:max-w-2xl">
         <div
-            class="bg-white/90 dark:bg-black/30 backdrop-blur-sm rounded-full shadow-lg flex items-center px-4 py-3 z-[9999]">
+            class="bg-white/90 dark:bg-black/30 backdrop-blur-sm rounded-full shadow-lg flex items-center px-4 py-3 z-9999">
           <!-- 搜索引擎选择器 -->
-
-          <n-dropdown trigger="hover" :options="searchEngines" @select="selectEngine" class="bg-white dark:bg-black/60 rounded-lg shadow-lg py-2">
+          <div class="relative" id="chooseEngine">
             <button
+                @click="showEngines = !showEngines"
                 class="flex items-center space-x-2 px-3 py-1 rounded-full dark:hover:bg-transparent hover:bg-gray-100 transition-colors"
             >
               <component :is="currentEngine.icon()" />
@@ -60,24 +60,20 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </button>
-          </n-dropdown>
-
-          <div class="relative" id="chooseEngine">
-
 
             <!-- 搜索引擎下拉菜单 -->
-            <div v-if="isShowEngines"
+            <div v-if="showEngines"
                  :class="[firstShowEngines ? 'opacity-0' : showEngines ? 'fade-in-scale' : 'fade-out-scale']"
-                 class="absolute top-full left-0 mt-4 bg-white dark:bg-black/60 rounded-lg shadow-lg py-2 z-[9999]"
+                 class="absolute top-full left-0 mt-4 bg-white dark:bg-black/60 rounded-lg shadow-lg py-2 z-9999"
             >
               <button
                   v-for="engine in searchEngines"
-                  :key="engine.id"
+                  :key="engine.key"
                   @click="selectEngine(engine)"
                   class="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-900 w-full text-left"
               >
-                <img :src="engine.icon" :alt="engine.name" class="w-5 h-5">
-                <span class="text-gray-700 dark:text-white/90">{{ engine.name }}</span>
+                <component :is="engine.icon()" class="w-5 h-5" />
+                <span class="text-gray-700 dark:text-white/90">{{ engine.label }}</span>
               </button>
             </div>
           </div>
@@ -142,9 +138,9 @@
         <div class="w-1/2">
           <div class="bg-white/90 dark:bg-white/50 backdrop-blur-sm rounded-full shadow-lg flex items-center px-3 py-2">
             <!-- 搜索引擎选择器 -->
-
-            <n-dropdown trigger="hover" :options="searchEngines" @select="selectEngine">
+            <div class="relative">
               <button
+                  @click="showEngines = !showEngines"
                   class="flex items-center space-x-2 px-3 py-1 rounded-full dark:hover:bg-transparent hover:bg-gray-100 transition-colors"
               >
                 <component :is="currentEngine.icon()" />
@@ -152,7 +148,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </button>
-            </n-dropdown>
+            </div>
 
             <!-- 搜索输入框 -->
             <input
@@ -191,8 +187,22 @@ import LoginCard from "./LoginCard.vue";
 import {Settings16Filled} from '@vicons/fluent'
 import {AccountCircleRound} from '@vicons/material'
 import {Icon} from '@vicons/utils'
-import {NDropdown} from 'naive-ui'
-import {useSearchEngineStore} from '../stores/SearchEngineStore'
+
+// 定义搜索引擎类型
+interface SearchEngine {
+  key: string;
+  label: string;
+  icon: any;
+}
+
+// 模拟SearchEngineStore，因为找不到原始模块
+const searchEngineStore = {
+  currentEngineKey: ref('1'),
+  initCurrentEngine: () => {},
+  setCurrentEngine: (key: string) => {
+    searchEngineStore.currentEngineKey.value = key;
+  }
+};
 
 defineProps({
   isShowSetting: {
@@ -201,15 +211,16 @@ defineProps({
   }
 })
 
-function renderIcon(icon) {
+// 为函数添加类型
+function renderIcon(icon: string): () => any {
   return () => {
-    return h('img', {class : 'w-5 h-5',src: icon});
+    return h('img', {class: 'w-5 h-5', src: icon});
   };
 }
 
 const engineLink = ['https://www.baidu.com/s?wd=','https://www.google.com/search?q=','https://www.bing.com/search?q=','https://duckduckgo.com/?q=']
 
-const searchEngines = [
+const searchEngines: SearchEngine[] = [
   {
     key: '1',
     label: '百度',
@@ -237,27 +248,25 @@ const showEngines = ref(false)
 const firstShowEngines = ref(true)
 const firstSticky = ref(true)
 const time = ref('')
-const suggestions = ref([])
+const suggestions = ref<string[]>([])
 const selectedSuggestionIndex = ref(-1)
 const isSticky = ref(false);
-const originalNav = ref(null);
-const searchEngineStore = useSearchEngineStore()
-const currentEngine = ref(searchEngines[0])
+const originalNav = ref<HTMLElement | null>(null);
+const currentEngine = ref<SearchEngine>(searchEngines[0])
 const isOpenSuggestions = ref(false)
 const isOpenSetting = ref(false)
 const isOpenAccount = ref(false)
-const isShowEngines = ref(false)
 const isOpenLogin = ref(false)
 
 // Watch for changes in the store
-watch(() => searchEngineStore.currentEngineKey, (newKey) => {
-  const engine = searchEngines.find(item => item.key === newKey)
+watch(() => searchEngineStore.currentEngineKey.value, (newKey: string) => {
+  const engine = searchEngines.find(item => item.key === newKey);
   if (engine) {
-    currentEngine.value = engine
+    currentEngine.value = engine;
   }
-})
+});
 
-const updateTime = function () {
+const updateTime = function (): void {
   const now = new Date();
   // 获取小时和分钟
   const hours = now.getHours().toString().padStart(2, '0');
@@ -267,100 +276,132 @@ const updateTime = function () {
 };
 
 // Initialize current engine from store
-const initializeCurrentEngine = () => {
-  searchEngineStore.initCurrentEngine()
-  const engine = searchEngines.find(item => item.key === searchEngineStore.currentEngineKey)
+const initializeCurrentEngine = (): void => {
+  searchEngineStore.initCurrentEngine();
+  const engine = searchEngines.find(item => item.key === searchEngineStore.currentEngineKey.value);
   if (engine) {
-    currentEngine.value = engine
+    currentEngine.value = engine;
   }
-}
+};
 
-const selectEngine = (key) => {
-  currentEngine.value = searchEngines.find(item => item.key === key)
-  showEngines.value = false
+// 为参数添加类型
+const selectEngine = (engine: string | SearchEngine): void => {
+  // 处理直接传入key或完整对象的情况
+  const engineKey = typeof engine === 'string' ? engine : engine.key;
+  const foundEngine = searchEngines.find(item => item.key === engineKey);
+  if (foundEngine) {
+    currentEngine.value = foundEngine;
+  }
+  showEngines.value = false;
   
   // Use store instead of LocalStorageHelper
-  searchEngineStore.setCurrentEngine(key)
-}
+  searchEngineStore.setCurrentEngine(engineKey);
+};
 
-const search = async () => {
-  if (selectedSuggestionIndex.value !== -1) {
-    const searchUrl = engineLink[parseInt(currentEngine.value.key) - 1] + encodeURIComponent(suggestions.value[selectedSuggestionIndex.value])
-    window.open(searchUrl)
-    searchQuery.value = ''
-    selectedSuggestionIndex.value = -1
-    return
+const search = async (): Promise<void> => {
+  if (selectedSuggestionIndex.value !== -1 && selectedSuggestionIndex.value < suggestions.value.length) {
+    const engineIndex = parseInt(currentEngine.value.key) - 1;
+    if (engineIndex >= 0 && engineIndex < engineLink.length) {
+      const searchUrl = engineLink[engineIndex] + encodeURIComponent(suggestions.value[selectedSuggestionIndex.value]);
+      window.open(searchUrl);
+    }
+    searchQuery.value = '';
+    selectedSuggestionIndex.value = -1;
+    return;
   }
 
   if (searchQuery.value.trim()) {
-    const searchUrl = engineLink[parseInt(currentEngine.value.key) - 1] + encodeURIComponent(searchQuery.value)
-    window.open(searchUrl)
+    const engineIndex = parseInt(currentEngine.value.key) - 1;
+    if (engineIndex >= 0 && engineIndex < engineLink.length) {
+      const searchUrl = engineLink[engineIndex] + encodeURIComponent(searchQuery.value);
+      window.open(searchUrl);
+    }
   }
-}
+};
 
-const transform = () => {
+const transform = (): void => {
   if (searchQuery.value.trim()) {
-    window.open(`https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(searchQuery.value)}&op=translate`)
+    window.open(`https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(searchQuery.value)}&op=translate`);
   }
+};
+
+// 定义百度建议接口的响应类型
+interface BaiduSuggestionResponse {
+  s: string[];
 }
 
-const getSuggestions = async () => {
-  selectedSuggestionIndex.value = -1
+const getSuggestions = async (): Promise<void> => {
+  selectedSuggestionIndex.value = -1;
 
   if (searchQuery.value === '') {
-    isOpenSuggestions.value = false
-    suggestions.value = []
-    return
+    isOpenSuggestions.value = false;
+    suggestions.value = [];
+    return;
   }
-  const result = await new Promise((resolve) => {
+  
+  const result = await new Promise<BaiduSuggestionResponse>((resolve) => {
     const callbackName = `jsonp_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-    window[callbackName] = (data) => {
+    (window as any)[callbackName] = (data: BaiduSuggestionResponse) => {
       resolve(data);
-      delete window[callbackName];
+      delete (window as any)[callbackName];
       document.body.removeChild(script);
     };
     const script = document.createElement('script');
     script.src = `https://suggestion.baidu.com/su?wd=${encodeURIComponent(searchQuery.value)}&cb=${callbackName}`;
     document.body.appendChild(script);
   });
-  suggestions.value = result.s
-  isOpenSuggestions.value = suggestions.value.length > 0
-}
+  
+  suggestions.value = result.s || [];
+  isOpenSuggestions.value = suggestions.value.length > 0;
+};
 
-const openUrl = (text) => {
-  const searchUrl = engineLink[parseInt(currentEngine.value.key) - 1] + encodeURIComponent(text)
-  window.open(searchUrl)
-}
-
-// 滚动监听函数
-const handleScroll = () => {
-  if (!originalNav.value) return;
-
-  const rect = originalNav.value.getBoundingClientRect();
-  // 当原始导航完全离开视口顶部时，激活固定导航
-  isSticky.value = rect.bottom <= 0;
-
-  if (isSticky.value && firstSticky.value) {
-    firstSticky.value = false
+const openUrl = (text: string): void => {
+  const engineIndex = parseInt(currentEngine.value.key) - 1;
+  if (engineIndex >= 0 && engineIndex < engineLink.length) {
+    const searchUrl = engineLink[engineIndex] + encodeURIComponent(text);
+    window.open(searchUrl);
   }
 };
 
-const hide = () => {
+// 防抖函数，避免滚动时频繁触发
+let scrollTimeout: number | undefined;
+const handleScroll = (): void => {
+  // 清除之前的定时器
+  if (scrollTimeout) {
+    clearTimeout(scrollTimeout);
+  }
+  
+  // 设置新的定时器，延迟执行实际逻辑
+  scrollTimeout = window.setTimeout(() => {
+    if (!originalNav.value) return;
+
+    const rect = originalNav.value.getBoundingClientRect();
+    // 当原始导航完全离开视口顶部时，激活固定导航
+    isSticky.value = rect.bottom <= 0;
+
+    // 当第一次变为粘性状态时，标记firstSticky为false以显示动画
+    if (isSticky.value && firstSticky.value) {
+      firstSticky.value = false;
+    }
+  }, 50); // 50ms的防抖延迟
+};
+
+const hide = (): boolean => {
   if (showEngines.value) {
-    console.log(showEngines.value)
-    return true
+    console.log(showEngines.value);
+    return true;
   }
   if (isOpenSuggestions.value) {
-    isOpenSuggestions.value = false
-    console.log(isOpenSuggestions.value)
-    return true
+    isOpenSuggestions.value = false;
+    console.log(isOpenSuggestions.value);
+    return true;
   }
-  return false
-}
+  return false;
+};
 
 // 添加和移除滚动事件监听
 onMounted(() => {
-  initializeCurrentEngine()
+  initializeCurrentEngine();
   window.addEventListener('scroll', handleScroll);
   updateTime();
   // 每分钟更新一次时间
@@ -369,12 +410,15 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
+  if (scrollTimeout) {
+    clearTimeout(scrollTimeout);
+  }
 });
 
 defineExpose({
   name: 'hide',
   hide
-})
+});
 </script>
 
 <style scoped>
