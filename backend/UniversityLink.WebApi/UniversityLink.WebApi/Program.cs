@@ -12,6 +12,7 @@ using UniversityLink.Data;
 using UniversityLink.DataApi.Repositories;
 using UniversityLink.DataApi.Services;
 using UniversityLink.WebApi;
+using UniversityLink.WebApi.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -146,6 +147,8 @@ else
 #region 仓储和服务的依赖注入
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IJwtGenerate, JwtGenerate>();
 
 // 注册仓储层实现
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
