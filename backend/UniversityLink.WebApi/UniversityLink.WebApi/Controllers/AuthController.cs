@@ -27,7 +27,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
             // 构建OAuth2授权URL
             var clientId = Environment.GetEnvironmentVariable("OAUTH_CLIENT_ID") ?? "your-client-id";
             var redirectUrl = Environment.GetEnvironmentVariable("OAUTH_REDIRECT_URI") ??
-                              "https://start.xauat.site/callback";
+                              "https://link.xauat.site/callback";
 
             var state = Guid.NewGuid().ToString(); // 简单的state实现，实际项目中应该存储在session或缓存中
 

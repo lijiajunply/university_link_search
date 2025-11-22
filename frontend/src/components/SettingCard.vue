@@ -28,22 +28,27 @@
 
 <script setup>
 import {NSwitch} from "naive-ui";
-import {ref} from "vue";
+import {computed} from "vue";
+import {useSettingStore} from "../stores/SettingStore";
 
 defineProps({
   show: Boolean,
 });
 
 const emit = defineEmits(['update:show']);
+const settingStore = useSettingStore();
 
 function closeModal() {
   emit('update:show', false);
 }
 
-const isShow = ref(localStorage.getItem('is-show-tiles') === 'true')
+const isShow = computed({
+  get: () => settingStore.showTiles,
+  set: (value) => settingStore.setShowTiles(value)
+})
 
 const handleChange = (value) => {
-  localStorage.setItem('is-show-tiles', value)
+  settingStore.setShowTiles(value);
 }
 </script>
 

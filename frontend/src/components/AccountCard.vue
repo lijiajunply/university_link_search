@@ -1,10 +1,7 @@
 <template>
   <div class="p-6 rounded-lg w-sm backdrop-blur-xs bg-white/50 dark:bg-black/50">
     <template v-if="isLogin">
-      <div class="flex justify-center mb-1">
-        <img alt="" :src="`/assets/${userData.gender}生.png`" style="height: 50px;width: 50px">
-      </div>
-      <p class="text-gray-700 dark:text-gray-300 text-xl font-bold text-center mb-1">{{userData.userName}}</p>
+      <p class="text-gray-700 dark:text-gray-300 text-xl font-bold text-center mb-1">{{username}}</p>
 
       <!-- 副标题 -->
       <p class="text-gray-500 dark:text-gray-100 text-center text-sm">
@@ -35,20 +32,16 @@ import {AccountCircleRound} from '@vicons/material'
 import {Icon} from '@vicons/utils'
 import {onMounted, ref} from 'vue'
 import { useAuthorizationStore } from '../stores/Authorization.ts'
-import type {UserModel} from "../services/LoginService.ts";
 
 const store = useAuthorizationStore()
 const isLogin = ref(store.isAuthenticated);
-const userData = ref<UserModel>({} as UserModel)
+const username = ref<string>('')
 
 onMounted(() => {
   if (isLogin.value) {
-    const userInfo = store.getAuthorizationInfo
+    const userInfo = store.getClubData
     if (userInfo) {
-      userData.value = {
-        userName: userInfo['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
-        gender: userInfo.Gender
-      }
+      username.value = userInfo.name
     }
   }
 })

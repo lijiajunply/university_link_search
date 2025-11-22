@@ -17,7 +17,8 @@ export const useAuthorizationStore = defineStore('AuthorizationId', {
         // 添加edu相关的getter
         getIsShowEdu: (state) => state.isShowEdu,
         getEduPassword: (state) => state.eduPassword,
-        getUserData: (state) => state.userData
+        getUserData: (state) => state.userData,
+        getClubData: (state) => state.clubData as ClubData,
     },
     actions: {
         logout() {
