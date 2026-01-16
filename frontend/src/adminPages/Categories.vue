@@ -149,6 +149,7 @@ const isEdit = ref(false)
 const categories = ref<CategoryModel[]>([])
 const formRef = ref<FormInst | null>(null)
 const tableContainer = ref<HTMLElement | null>(null)
+const sortableInstance = ref<Sortable | null>(null)
 
 // 表单数据
 const defaultForm: CategoryModel = {
@@ -170,6 +171,16 @@ const rules = {
 
 // 表格列定义
 const columns: DataTableColumns<CategoryModel> = [
+  {
+    key: 'drag',
+    width: 40,
+    render() {
+      return h(Icon, { 
+        icon: 'solar:hamburger-menu-linear', 
+        class: 'drag-handle cursor-move w-5 h-5 text-[--text-tertiary] hover:text-[--text-primary] transition-colors' 
+      })
+    }
+  },
   {
     title: '图标',
     key: 'icon',
@@ -331,7 +342,12 @@ const initSortable = () => {
   const el = tableContainer.value.querySelector('.n-data-table-tbody') as HTMLElement
   if (!el) return
 
-  Sortable.create(el, {
+  if (sortableInstance.value) {
+    sortableInstance.value.destroy()
+    sortableInstance.value = null
+  }
+
+  sortableInstance.value = Sortable.create(el, {
     handle: '.drag-handle',
     animation: 150,
     ghostClass: 'bg-blue-500/10',
@@ -365,12 +381,14 @@ const initSortable = () => {
   })
 }
 
-onMounted(() => {
-  fetchData().then(() => {
-    nextTick(() => {
-      initSortable()
-    })
+watch(() => categories.value, () => {
+  nextTick(() => {
+    initSortable()
   })
+}, { deep: false })
+
+onMounted(() => {
+  fetchData()
 })
 </script>
 
