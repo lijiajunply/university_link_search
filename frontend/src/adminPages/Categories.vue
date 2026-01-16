@@ -127,7 +127,7 @@
 <script setup lang="ts">
 import { h, onMounted, ref, reactive, nextTick } from 'vue'
 import { 
-  NDataTable, NButton, NModal, NForm, NFormItem, NInput, NInputNumber, 
+  NDataTable, NModal, NForm, NFormItem, NInput, NInputNumber, 
   useMessage, useDialog, type DataTableColumns, type FormInst
 } from 'naive-ui'
 import { Icon } from '@iconify/vue'
@@ -215,7 +215,7 @@ const columns: DataTableColumns<CategoryModel> = [
           class: 'p-2 rounded-lg hover:bg-blue-500/10 text-blue-500 transition-colors',
           title: '管理链接',
           onClick: () => router.push(`/category/${row.key}`) // 使用 key 还是 id? Service getCategoryById 接收 string。
-          // 检查 Service: fetch(`${url}/category/${id}`). 通常 ID 是 _id. 
+          // 检查 Service: fetch(`${url}/category/${id}`). 通常 ID 是 _id. 如果是 SQL, 应该有 id.
           // 但是 Model 没有 _id, 只有 key. 
           // 假设后端使用 key 作为 ID 或者 Model 定义缺失 _id.
           // 观察 Service createCategory 返回 CategoryModel.
@@ -340,23 +340,25 @@ const initSortable = () => {
 
       // 移动数组元素
       const item = categories.value.splice(oldIndex, 1)[0]
-      categories.value.splice(newIndex, 0, item)
+      if(item !== undefined) {
+        categories.value.splice(newIndex, 0, item)
+      
+        // 更新本地索引显示（可选）
+        categories.value.forEach((cat, idx) => {
+          cat.index = idx
+        })
 
-      // 更新本地索引显示（可选）
-      categories.value.forEach((cat, idx) => {
-        cat.index = idx
-      })
-
-      // 调用API更新排序
-      try {
-        // 假设后端接受 key 数组作为排序依据
-        const sortedIds = categories.value.map(c => c.key)
-        await CategoryService.updateCategorySort(sortedIds)
-        message.success('排序已更新')
-      } catch (error: any) {
-        message.error(error.message || '排序更新失败')
-        // 失败时重新获取数据以恢复原状
-        fetchData()
+        // 调用API更新排序
+        try {
+          // 假设后端接受 key 数组作为排序依据
+          const sortedIds = categories.value.map(c => c.key)
+          await CategoryService.updateCategorySort(sortedIds)
+          message.success('排序已更新')
+        } catch (error: any) {
+          message.error(error.message || '排序更新失败')
+          // 失败时重新获取数据以恢复原状
+          fetchData()
+        }
       }
     }
   })
