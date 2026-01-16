@@ -70,7 +70,7 @@ public class AuthController(IJwtGenerate generate) : ControllerBase
             {
                 Sub = sub,
                 Name = name,
-                Role = role // 保持使用原始 role，与 Program.cs 中的 Policy 匹配
+                Role = finalRole // 保持使用原始 role，与 Program.cs 中的 Policy 匹配
             });
 
             return Redirect(
