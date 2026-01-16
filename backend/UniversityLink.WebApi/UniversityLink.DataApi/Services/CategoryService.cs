@@ -85,17 +85,43 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
     // 删除分类
     public async Task DeleteCategoryAsync(string id, CancellationToken cancellationToken = default)
     {
-        // 在当前实现中，我们通过Key删除分类
-        // 由于模型中没有Id属性，这里不执行操作
-        await Task.CompletedTask;
+        // 验证分类是否存在
+        var existingCategory = await unitOfWork.Categories.GetByKeyAsync(id, false, cancellationToken);
+        if (existingCategory == null)
+        {
+            throw new KeyNotFoundException($"分类Key '{id}' 不存在");
+        }
+
+        await unitOfWork.Categories.DeleteAsync(id, cancellationToken);
     }
 
     // 更新分类排序
     public async Task UpdateCategorySortAsync(List<string> categoryIds, CancellationToken cancellationToken = default)
     {
-        // 在当前实现中，我们使用Index属性进行排序
-        // 由于模型中没有Id属性，这里不执行操作
-        await Task.CompletedTask;
+        // 获取所有分类
+        var categories = (await unitOfWork.Categories.GetAllAsync(false, cancellationToken)).ToList();
+
+        // 创建一个字典来快速查找顺序
+        var orderDict = categoryIds.Select((id, index) => new { id, index })
+                                   .ToDictionary(x => x.id, x => x.index);
+
+        bool needsUpdate = false;
+        foreach (var category in categories)
+        {
+            if (orderDict.TryGetValue(category.Key, out var index))
+            {
+                if (category.Index != index)
+                {
+                    category.Index = index;
+                    needsUpdate = true;
+                }
+            }
+        }
+
+        if (needsUpdate)
+        {
+            await unitOfWork.Categories.BulkUpdateAsync(categories, cancellationToken);
+        }
     }
 
     // 搜索分类

@@ -3,13 +3,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using UniversityLink.Data;
-using UniversityLink.DataApi.Services;
 
 namespace UniversityLink.WebApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AuthController(IUserService userService, IJwtGenerate generate) : ControllerBase
+public class AuthController(IJwtGenerate generate) : ControllerBase
 {
     // GET: api/auth/authorize
     [HttpGet("authorize")]
@@ -61,37 +60,16 @@ public class AuthController(IUserService userService, IJwtGenerate generate) : C
                 return Unauthorized(new { message = "获取访问令牌失败" });
             }
 
-            // 检查用户是否已存在，如果不存在则创建
-            var existingUser =
-                await userService.GetUserByUsernameAsync(name ?? sub ?? "", cancellationToken);
-            if (existingUser != null)
-            {
-                // 用户已存在，更新用户信息（注意：实际项目中可能需要更复杂的用户更新逻辑）
-                existingUser.UserName = name ?? sub ?? "";
-                existingUser.Identity =
-                    string.IsNullOrEmpty(role) || role == "Member" ? "User" : "Admin";
-                await userService.UpdateUserAsync(existingUser, cancellationToken);
-            }
-            else
-            {
-                // 用户不存在，创建新用户
-                var user = new UserModel
-                {
-                    UserName = name ?? sub ?? "",
-                    UserId = sub ?? "",
-                    Identity = string.IsNullOrEmpty(role) || role == "Member" ? "User" : "Admin"
-                };
-
-                // 创建用户（注意：实际项目中可能需要更复杂的用户创建逻辑）
-                await userService.CreateUserAsync(user, "default-password", cancellationToken);
-            }
+            // 完全信赖 OAuth2 的数据，不再查询或写入本地数据库
+            // 角色映射逻辑：如果 OAuth 未返回角色或角色为 Member，则视为 User；否则视为 Admin
+            var finalRole = string.IsNullOrEmpty(role) || role == "Member" ? "User" : "Admin";
 
             // 返回JWT格式的令牌给前端
             var token = generate.GenerateJwtToken(new OAuthUserInfo()
             {
                 Sub = sub,
                 Name = name,
-                Role = role
+                Role = role // 保持使用原始 role，与 Program.cs 中的 Policy 匹配
             });
 
             return Redirect(

@@ -70,11 +70,11 @@ export class LinkService {
 
   // 创建链接
   public static async createLink(link: LinkModel): Promise<LinkModel> {
-    const response = await fetchWithAuth('/update', {
+    const response = await fetchWithAuth('/link', {
       method: 'POST',
       body: JSON.stringify(link)
     });
-
+    
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || '创建链接失败');
@@ -85,7 +85,7 @@ export class LinkService {
 
   // 更新链接
   public static async updateLink(link: LinkModel): Promise<void> {
-    const response = await fetchWithAuth('/link', {
+    const response = await fetchWithAuth('/link/update', {
       method: 'POST',
       body: JSON.stringify(link)
     });

@@ -61,7 +61,7 @@ export class CategoryService {
 
   // 更新分类
   public static async updateCategory(category: CategoryModel): Promise<void> {
-    const response = await fetchWithAuth('/update', {
+    const response = await fetchWithAuth('/category/update', {
       method: 'POST',
       body: JSON.stringify(category)
     });
