@@ -25,13 +25,16 @@
     </div>
 
     <!-- 数据表格区域 -->
-    <div class="bg-white/80 dark:bg-[#18181c]/80 backdrop-blur-xl rounded-2xl border border-[--border-primary] shadow-sm overflow-hidden">
+    <div 
+      ref="tableContainer"
+      class="bg-white/80 dark:bg-[#18181c]/80 backdrop-blur-xl rounded-2xl border border-[--border-primary] shadow-sm overflow-hidden">
       <n-data-table
         :columns="columns"
         :data="links"
         :loading="loading"
         :bordered="false"
         :single-line="false"
+        :row-key="(row) => row.key"
         class="custom-table"
       />
     </div>
@@ -144,12 +147,13 @@
 </template>
 
 <script setup lang="ts">
-import { h, onMounted, ref, reactive } from 'vue'
+import { h, onMounted, ref, reactive, nextTick, watch } from 'vue'
 import { 
   NDataTable, NButton, NModal, NForm, NFormItem, NInput, NInputNumber, 
   useMessage, useDialog, type DataTableColumns, type FormInst
 } from 'naive-ui'
 import { Icon } from '@iconify/vue'
+import Sortable from 'sortablejs'
 import { useRoute, useRouter } from 'vue-router'
 import { LinkService } from '../services/LinkService'
 import { CategoryService } from '../services/CategoryService'
@@ -168,6 +172,7 @@ const isEdit = ref(false)
 const categoryName = ref('')
 const links = ref<LinkModel[]>([])
 const formRef = ref<FormInst | null>(null)
+const tableContainer = ref<HTMLElement | null>(null)
 
 // 当前分类ID
 const categoryId = route.params.id as string
@@ -355,6 +360,62 @@ const handleSubmit = (e: MouseEvent) => {
     }
   })
 }
+
+// 初始化拖拽排序
+const sortableInstance = ref<Sortable | null>(null)
+
+const initSortable = () => {
+  if (!tableContainer.value) return
+  
+  const el = tableContainer.value.querySelector('tbody')
+  if (!el) return
+
+  // 如果已经初始化过，先销毁
+  if (sortableInstance.value) {
+    sortableInstance.value.destroy()
+    sortableInstance.value = null
+  }
+
+  sortableInstance.value = Sortable.create(el, {
+    handle: '.drag-handle',
+    animation: 150,
+    ghostClass: 'bg-blue-500/10',
+    onEnd: async (evt) => {
+      const { oldIndex, newIndex } = evt
+      if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return
+
+      // 移动数组元素
+      const item = links.value.splice(oldIndex, 1)[0]
+      if (item !== undefined) {
+        links.value.splice(newIndex, 0, item)
+
+        // 更新本地索引显示（可选）
+        links.value.forEach((link, idx) => {
+          link.index = idx
+        })
+
+        // 调用API更新排序
+        try {
+          // 假设后端接受 key 数组作为排序依据，并且需要 categoryId
+          const sortedIds = links.value.map(l => l.key)
+          await LinkService.updateLinkSort(categoryId, sortedIds)
+          message.success('排序已更新')
+        } catch (error: any) {
+          message.error(error.message || '排序更新失败')
+          // 失败时重新获取数据以恢复原状
+          fetchData()
+        }
+      }
+    }
+  })
+}
+
+// 监听数据变化，确保在数据加载后重新初始化
+watch(() => links.value, () => {
+  nextTick(() => {
+    initSortable()
+  })
+}, { deep: false })
 
 onMounted(() => {
   fetchData()

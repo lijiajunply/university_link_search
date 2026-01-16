@@ -22,6 +22,7 @@
         :loading="loading"
         :bordered="false"
         :single-line="false"
+        :row-key="(row) => row.key"
         class="custom-table"
       />
     </div>
@@ -125,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, onMounted, ref, reactive, nextTick } from 'vue'
+import { h, onMounted, ref, reactive, nextTick, watch } from 'vue'
 import { 
   NDataTable, NModal, NForm, NFormItem, NInput, NInputNumber, 
   useMessage, useDialog, type DataTableColumns, type FormInst
@@ -377,14 +378,12 @@ onMounted(() => {
 .custom-table :deep(.n-data-table-th) {
   background-color: transparent;
   border-bottom: 1px solid var(--border-primary);
-  color: var(--text-secondary);
   font-weight: 600;
 }
 
 .custom-table :deep(.n-data-table-td) {
   background-color: transparent;
   border-bottom: 1px solid var(--border-primary);
-  color: var(--text-primary);
 }
 
 .custom-table :deep(.n-data-table-tr:last-child .n-data-table-td) {

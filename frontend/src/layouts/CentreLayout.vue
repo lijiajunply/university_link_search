@@ -153,16 +153,6 @@ const navItems: NavItem[] = [
     path: '/categories', 
     label: '分类', 
     icon: 'solar:widget-5-bold-duotone' 
-  },
-  { 
-    path: '/users', 
-    label: '用户', 
-    icon: 'solar:users-group-rounded-bold-duotone' 
-  },
-  { 
-    path: '/data', 
-    label: '数据', 
-    icon: 'solar:database-bold-duotone' 
   }
 ]
 
