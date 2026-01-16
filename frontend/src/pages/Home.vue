@@ -9,7 +9,6 @@ import FooterContent from "../components/FooterContent.vue";
 import SearchBar from "../components/SearchBar.vue";
 import LinkCard from "../components/home/LinkCard.vue";
 import { CategoryService } from "../services/CategoryService";
-import { useThemeStore } from "../stores/ThemeStore";
 import { useContextMenu } from "../composables/useContextMenu";
 import { getCategoryColClass, getLinkColClass } from "../utils/layoutHelper";
 
@@ -20,7 +19,6 @@ const searchRef = ref()
 const showSetting = ref(false)
 
 // 使用 Composables
-useThemeStore();
 const { isRightMenuVisible, hideMenu } = useContextMenu(searchRef);
 
 const qrCodeModalOpen = (link: any) => {

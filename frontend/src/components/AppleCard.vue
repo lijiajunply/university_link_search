@@ -11,14 +11,14 @@
         :class="['apple-card-header', headerClass]"
         :style="headerStyle"
     >
-      <slot name="title"/>
+      <slot name="title"></slot>
     </div>
 
     <div
         :class="['apple-card-context', contextClass]"
         :style="contextStyle"
     >
-      <slot name="context"/>
+      <slot name="context"></slot>
     </div>
   </div>
 </template>

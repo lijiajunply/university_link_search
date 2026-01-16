@@ -149,7 +149,7 @@
 <script setup lang="ts">
 import { h, onMounted, ref, reactive, nextTick, watch } from 'vue'
 import { 
-  NDataTable, NButton, NModal, NForm, NFormItem, NInput, NInputNumber, 
+  NDataTable, NModal, NForm, NFormItem, NInput, NInputNumber, 
   useMessage, useDialog, type DataTableColumns, type FormInst
 } from 'naive-ui'
 import { Icon } from '@iconify/vue'
@@ -426,14 +426,12 @@ onMounted(() => {
 .custom-table :deep(.n-data-table-th) {
   background-color: transparent;
   border-bottom: 1px solid var(--border-primary);
-  color: var(--text-secondary);
   font-weight: 600;
 }
 
 .custom-table :deep(.n-data-table-td) {
   background-color: transparent;
   border-bottom: 1px solid var(--border-primary);
-  color: var(--text-primary);
 }
 
 .custom-table :deep(.n-data-table-tr:last-child .n-data-table-td) {
