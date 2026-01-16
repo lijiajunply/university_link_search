@@ -51,10 +51,7 @@ builder.Services.AddAuthentication(options =>
         options.TokenEndpoint = "https://api.xauat.site/SSO/token";
         options.UserInformationEndpoint = "https://api.xauat.site/SSO/userinfo";
 
-        options.Scope.Add("profile");
-        options.Scope.Add("email");
-        options.Scope.Add("openid");
-        options.Scope.Add("read");
+        options.Scope.Add("full");
 
         options.SaveTokens = true;
 

@@ -18,22 +18,10 @@ const routes = [
         component: () => import('./layouts/CentreLayout.vue'),
         children: [
             {
-                path: 'users',
-                name: 'Users',
-                meta: { title: "用户管理" },
-                component: () => import('./adminPages/Users.vue'),
-            },
-            {
                 path: 'categories',
                 name: 'Categories',
                 meta: { title: "分类管理" },
                 component: () => import('./adminPages/Categories.vue'),
-            },
-            {
-                path: 'data',
-                name: 'Data',
-                meta: { title: "数据管理" },
-                component: () => import('./adminPages/DataImportExport.vue'),
             },
             {
                 path: 'category/:id',

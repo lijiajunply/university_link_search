@@ -125,12 +125,13 @@
 </template>
 
 <script setup lang="ts">
-import { h, onMounted, ref, reactive } from 'vue'
+import { h, onMounted, ref, reactive, nextTick } from 'vue'
 import { 
   NDataTable, NButton, NModal, NForm, NFormItem, NInput, NInputNumber, 
   useMessage, useDialog, type DataTableColumns, type FormInst
 } from 'naive-ui'
 import { Icon } from '@iconify/vue'
+import Sortable from 'sortablejs'
 import { useRouter } from 'vue-router'
 import { CategoryService } from '../services/CategoryService'
 import type { CategoryModel } from '../models/category'
@@ -146,6 +147,7 @@ const showModal = ref(false)
 const isEdit = ref(false)
 const categories = ref<CategoryModel[]>([])
 const formRef = ref<FormInst | null>(null)
+const tableContainer = ref<HTMLElement | null>(null)
 
 // 表单数据
 const defaultForm: CategoryModel = {
@@ -321,8 +323,51 @@ const handleSubmit = (e: MouseEvent) => {
   })
 }
 
+// 初始化拖拽排序
+const initSortable = () => {
+  if (!tableContainer.value) return
+  
+  const el = tableContainer.value.querySelector('.n-data-table-tbody') as HTMLElement
+  if (!el) return
+
+  Sortable.create(el, {
+    handle: '.drag-handle',
+    animation: 150,
+    ghostClass: 'bg-blue-500/10',
+    onEnd: async (evt) => {
+      const { oldIndex, newIndex } = evt
+      if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) return
+
+      // 移动数组元素
+      const item = categories.value.splice(oldIndex, 1)[0]
+      categories.value.splice(newIndex, 0, item)
+
+      // 更新本地索引显示（可选）
+      categories.value.forEach((cat, idx) => {
+        cat.index = idx
+      })
+
+      // 调用API更新排序
+      try {
+        // 假设后端接受 key 数组作为排序依据
+        const sortedIds = categories.value.map(c => c.key)
+        await CategoryService.updateCategorySort(sortedIds)
+        message.success('排序已更新')
+      } catch (error: any) {
+        message.error(error.message || '排序更新失败')
+        // 失败时重新获取数据以恢复原状
+        fetchData()
+      }
+    }
+  })
+}
+
 onMounted(() => {
-  fetchData()
+  fetchData().then(() => {
+    nextTick(() => {
+      initSortable()
+    })
+  })
 })
 </script>
 
