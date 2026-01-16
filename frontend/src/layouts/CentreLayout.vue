@@ -44,9 +44,9 @@
               aria-label="切换主题"
             >
               <Icon 
-                :icon="isDark ? 'solar:moon-bold' : 'solar:sun-bold'" 
+                :icon="isDarkMode ? 'solar:moon-bold' : 'solar:sun-bold'" 
                 class="w-5 h-5 transition-transform duration-500 rotate-0" 
-                :class="{ 'rotate-[360deg] text-yellow-500': !isDark, 'text-blue-400': isDark }" 
+                :class="{ 'rotate-[360deg] text-yellow-500': !isDarkMode, 'text-blue-400': isDarkMode }" 
               />
             </button>
 
@@ -130,10 +130,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { Icon } from '@iconify/vue'
-import { useOsTheme } from 'naive-ui'
+import { useThemeStore } from '../stores/ThemeStore'
+import { storeToRefs } from 'pinia'
 
 // 导航项接口
 interface NavItem {
@@ -160,37 +161,9 @@ const navItems: NavItem[] = [
 const mobileMenuOpen = ref(false)
 const route = useRoute()
 const currentYear = computed(() => new Date().getFullYear())
-const isDark = ref(false)
-
-// 主题切换逻辑
-const toggleTheme = () => {
-  isDark.value = !isDark.value
-  updateThemeClass()
-}
-
-const updateThemeClass = () => {
-  const htmlEl = document.documentElement
-  if (isDark.value) {
-    htmlEl.classList.add('dark')
-  } else {
-    htmlEl.classList.remove('dark')
-  }
-  // 保存偏好
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-}
-
-// 初始化主题
-onMounted(() => {
-  const savedTheme = localStorage.getItem('theme')
-  const osTheme = useOsTheme()
-  
-  if (savedTheme) {
-    isDark.value = savedTheme === 'dark'
-  } else {
-    isDark.value = osTheme.value === 'dark'
-  }
-  updateThemeClass()
-})
+const themeStore = useThemeStore()
+const { isDarkMode } = storeToRefs(themeStore)
+const { toggleTheme } = themeStore
 
 // 判断路由是否激活
 const isActiveRoute = (path: string): boolean => {
