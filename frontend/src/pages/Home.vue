@@ -36,32 +36,24 @@ onMounted(async () => {
     <div class="home-bg" :class="[isRightMenuVisible ? 'blur-sm' : 'blur-none']"></div>
 
     <!-- 搜索栏 -->
-    <SearchBar :is-show-setting="isRightMenuVisible" ref="searchRef"/>
+    <SearchBar :is-show-setting="isRightMenuVisible" ref="searchRef" />
 
     <div class="mx-auto px-8 md:px-16 pt-8 -z-10">
-      <TilesCard class="opacity-0 animate-fade-in"
-                 :style="{ animationDelay: `${0.1}s`}"/>
+      <TilesCard class="opacity-0 animate-fade-in" :style="{ animationDelay: `${0.1}s` }" />
     </div>
 
     <template v-if="categories.length > 0">
       <!-- 网站分类卡片 -->
       <div class="mx-auto px-8 md:px-16 pt-8 -z-10">
         <div :class="[
-                'grid grid-cols-8 gap-6 md:gap-8']">
-          <div
-              v-for="(category, index) in categories"
-              :key="index"
-              :class="getCategoryColClass(index, categories.length)"
-              class="opacity-0 animate-fade-in"
-              :style="{ animationDelay: `${index * 0.2}s`}"
-          >
+          'grid grid-cols-8 gap-6 md:gap-8']">
+          <div v-for="(category, index) in categories" :key="index"
+            :class="getCategoryColClass(index, categories.length)" class="opacity-0 animate-fade-in"
+            :style="{ animationDelay: `${index * 0.2}s` }">
             <AppleCard class="h-full">
               <template #title>
                 <div class="flex gap-2.5">
-                  <IconFont
-                      :type="`#icon-${category.icon}`"
-                      class="text-[40px]"
-                  />
+                  <IconFont :type="`#icon-${category.icon}`" class="text-[40px]" />
                   <div class="font-bold text-[30px] leading-[1.35em] dark:text-white/80">
                     {{ category.name }}
                   </div>
@@ -73,14 +65,8 @@ onMounted(async () => {
 
               <template #context>
                 <div class="grid grid-cols-12 gap-x-1 gap-y-3 mb-4 mt-2">
-                  <div
-                      v-for="link in category.links"
-                      :class="getLinkColClass(index, categories.length)"
-                  >
-                    <LinkCard 
-                      :link="link" 
-                      @open-qr="qrCodeModalOpen" 
-                    />
+                  <div v-for="link in category.links" :class="getLinkColClass(index, categories.length)">
+                    <LinkCard :link="link" @open-qr="qrCodeModalOpen" />
                   </div>
                 </div>
               </template>
@@ -89,20 +75,14 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div class="opacity-0 animate-fade-in"
-           :style="{ animationDelay: `${(categories.length+1) * 0.2}s`}">
-        <FooterContent/>
+      <div class="opacity-0 animate-fade-in" :style="{ animationDelay: `${(categories.length + 1) * 0.2}s` }">
+        <FooterContent />
       </div>
     </template>
 
-    <QrCodeModal
-        v-model:show="showQrCodeModal"
-        :currentLink="currentModalLink"
-    />
+    <QrCodeModal v-model:show="showQrCodeModal" :currentLink="currentModalLink" />
 
-    <SettingCard
-        v-model:show="showSetting"
-    />
+    <SettingCard v-model:show="showSetting" />
   </div>
 </template>
 
@@ -121,10 +101,8 @@ onMounted(async () => {
   z-index: -9999;
 }
 
-@media (prefers-color-scheme: dark) {
-  .home-bg {
-    background-image: linear-gradient(to top, #1e3c72 0%, #1e3c72 1%, #2a5298 100%);
-  }
+.dark .home-bg {
+  background-image: linear-gradient(to top, #1e3c72 0%, #1e3c72 1%, #2a5298 100%);
 }
 
 @keyframes fade-in-scale {

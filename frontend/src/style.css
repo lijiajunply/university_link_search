@@ -1,5 +1,84 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    /* 浅色主题默认颜色 */
+    --color-background: #ffffff;
+    --color-foreground: #0a0a0a;
+    --color-card: #f8f9fa;
+    --color-card-foreground: #0a0a0a;
+    --color-primary: #3b82f6;
+    --color-primary-foreground: #ffffff;
+    --color-secondary: #e5e7eb;
+    --color-secondary-foreground: #0a0a0a;
+    --color-muted: #f3f4f6;
+    --color-muted-foreground: #6b7280;
+    --color-accent: #f3f4f6;
+    --color-accent-foreground: #0a0a0a;
+    --color-border: #e5e7eb;
+    --color-input: #e5e7eb;
+    --color-ring: #3b82f6;
+
+    /* Typography 专用颜色变量 */
+    --prose-body: #374151;
+    --prose-headings: #111827;
+    --prose-lead: #4b5563;
+    --prose-links: #3b82f6;
+    --prose-bold: #111827;
+    --prose-counters: #6b7280;
+    --prose-bullets: #9ca3af;
+    --prose-hr: #e5e7eb;
+    --prose-quotes: #111827;
+    --prose-quote-borders: #e5e7eb;
+    --prose-captions: #6b7280;
+    --prose-code: #111827;
+    --prose-code-bg: #f3f4f6;
+    --prose-pre-code: #e5e7eb;
+    --prose-pre-bg: #1f2937;
+    --prose-th-borders: #d1d5db;
+    --prose-td-borders: #e5e7eb;
+}
+
+/* 深色主题覆盖 */
+@layer theme {
+    .dark {
+        --color-background: #0a0a0a;
+        --color-foreground: #fafafa;
+        --color-card: #1a1a1a;
+        --color-card-foreground: #fafafa;
+        --color-primary: #60a5fa;
+        --color-primary-foreground: #0a0a0a;
+        --color-secondary: #262626;
+        --color-secondary-foreground: #fafafa;
+        --color-muted: #262626;
+        --color-muted-foreground: #a3a3a3;
+        --color-accent: #262626;
+        --color-accent-foreground: #fafafa;
+        --color-border: #262626;
+        --color-input: #262626;
+        --color-ring: #60a5fa;
+
+        /* Typography 深色主题颜色 */
+        --prose-body: #d1d5db;
+        --prose-headings: #f3f4f6;
+        --prose-lead: #9ca3af;
+        --prose-links: #60a5fa;
+        --prose-bold: #f3f4f6;
+        --prose-counters: #9ca3af;
+        --prose-bullets: #6b7280;
+        --prose-hr: #374151;
+        --prose-quotes: #e5e7eb;
+        --prose-quote-borders: #374151;
+        --prose-captions: #9ca3af;
+        --prose-code: #f3f4f6;
+        --prose-code-bg: #1f2937;
+        --prose-pre-bg: #111827;
+        --prose-th-borders: #4b5563;
+        --prose-td-borders: #374151;
+    }
+}
+
 ::-webkit-scrollbar {
     display: none;
 }
