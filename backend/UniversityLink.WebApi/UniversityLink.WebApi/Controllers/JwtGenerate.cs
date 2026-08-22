@@ -11,7 +11,8 @@ public class JwtGenerate : IJwtGenerate
 {
     public string GenerateJwtToken(OAuthUserInfo userInfo)
     {
-        var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "your-secret-key-here-change-in-production";
+        var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET")
+                        ?? throw new InvalidOperationException("缺少必需的环境变量 JWT_SECRET，无法签发令牌");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

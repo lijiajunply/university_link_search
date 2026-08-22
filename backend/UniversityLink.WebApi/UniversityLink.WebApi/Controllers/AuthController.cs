@@ -62,8 +62,9 @@ public class AuthController(IJwtGenerate generate) : ControllerBase
             }
 
             // 完全信赖 OAuth2 的数据，不再查询或写入本地数据库
-            // 角色映射逻辑：如果 OAuth 未返回角色或角色为 Member，则视为 User；否则视为 Admin
-            var finalRole = string.IsNullOrEmpty(role) || role == "Member" ? "User" : "Admin";
+            // 角色直接透传 OAuth 返回的原始角色（Member/Founder/President/Minister/Department），
+            // 与 Program.cs 中的 Policy 保持一致；角色缺失时回退为最低权限 Member
+            var finalRole = string.IsNullOrEmpty(role) ? "Member" : role;
 
             // 返回JWT格式的令牌给前端
             var token = generate.GenerateJwtToken(new OAuthUserInfo()

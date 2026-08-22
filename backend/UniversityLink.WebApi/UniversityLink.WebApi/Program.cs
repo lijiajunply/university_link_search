@@ -17,6 +17,15 @@ using UniversityLink.WebApi.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 必需的敏感配置：缺失时立即终止启动，避免回退到不安全的默认值
+static string RequireEnv(string name) =>
+    Environment.GetEnvironmentVariable(name)
+    ?? throw new InvalidOperationException($"缺少必需的环境变量 {name}，请配置后再启动");
+
+var jwtSecret = RequireEnv("JWT_SECRET");
+var oauthClientId = RequireEnv("OAUTH_CLIENT_ID");
+var oauthClientSecret = RequireEnv("OAUTH_CLIENT_SECRET");
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -43,8 +52,8 @@ builder.Services.AddAuthentication(options =>
     })
     .AddOAuth("ExternalOAuth", options =>
     {
-        options.ClientId = Environment.GetEnvironmentVariable("OAUTH_CLIENT_ID") ?? "your-client-id";
-        options.ClientSecret = Environment.GetEnvironmentVariable("OAUTH_CLIENT_SECRET") ?? "your-client-secret";
+        options.ClientId = oauthClientId;
+        options.ClientSecret = oauthClientSecret;
         options.CallbackPath = "/Auth/Callback";
 
         options.AuthorizationEndpoint = "https://api.xauat.site/SSO/authorize";
@@ -106,8 +115,7 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuerSigningKey = true,
             ValidIssuer = "UniversityLink",
             ValidAudience = "UniversityLinkUsers",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                Environment.GetEnvironmentVariable("JWT_SECRET") ?? "your-secret-key-here-change-in-production"))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
         };
     });
 
@@ -132,7 +140,6 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy.SetIsOriginAllowed(origin =>
-                origin.EndsWith(".zeabur.app") || // 支持所有 zeabur.app 子域名
                 origin.EndsWith(".xauat.site") || // 支持所有 xauat.site 子域名
                 origin.StartsWith("http://localhost")) // 支持本地开发环境
             .AllowAnyMethod()
