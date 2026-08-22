@@ -9,31 +9,13 @@
         <div class="flex items-center justify-between h-14 sm:h-16">
           <!-- Logo 区域 -->
           <router-link to="/" class="flex items-center gap-3 group relative z-10">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#007AFF] to-[#0055FF] flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 group-active:scale-95 transition-all duration-300">
+            <div class="w-9 h-9 rounded-xl bg-linear-to-br from-[#007AFF] to-[#0055FF] flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 group-active:scale-95 transition-all duration-300">
               <Icon icon="solar:home-smile-bold" class="w-5 h-5 text-white" />
             </div>
             <span class="text-lg font-semibold tracking-tight text-gray-900 dark:text-white hidden xs:block">
               建大导航
             </span>
           </router-link>
-
-          <!-- 桌面端导航 - 胶囊风格 -->
-          <nav class="hidden md:flex items-center p-1 bg-gray-100/80 dark:bg-[#2C2C2E]/80 backdrop-blur-md rounded-full border border-gray-200/50 dark:border-white/5 shadow-inner">
-            <router-link
-              v-for="item in navItems"
-              :key="item.path"
-              :to="item.path"
-              class="relative px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ease-out group"
-              :class="isActiveRoute(item.path) 
-                ? 'text-gray-900 dark:text-white bg-white dark:bg-[#636366] shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)]' 
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
-            >
-              <div class="flex items-center gap-2">
-                <Icon :icon="item.icon" class="w-4 h-4 transition-colors" :class="{ 'text-[#007AFF] dark:text-[#0A84FF]': isActiveRoute(item.path) }" />
-                <span>{{ item.label }}</span>
-              </div>
-            </router-link>
-          </nav>
 
           <!-- 右侧工具栏 -->
           <div class="flex items-center gap-3 relative z-10">
@@ -46,7 +28,7 @@
               <Icon 
                 :icon="isDarkMode ? 'solar:moon-bold' : 'solar:sun-bold'" 
                 class="w-5 h-5 transition-transform duration-500 rotate-0" 
-                :class="{ 'rotate-[360deg] text-yellow-500': !isDarkMode, 'text-blue-400': isDarkMode }" 
+                :class="{ 'rotate-360 text-yellow-500': !isDarkMode, 'text-blue-400': isDarkMode }" 
               />
             </button>
 

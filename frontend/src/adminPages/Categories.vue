@@ -6,12 +6,36 @@
         <h1 class="text-2xl sm:text-3xl font-bold text-[--text-primary] tracking-tight">分类管理</h1>
         <p class="mt-1 text-sm text-[--text-secondary]">管理网站首页显示的分类及其排序</p>
       </div>
-      <button
-        @click="handleCreate"
-        class="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 active:scale-95">
-        <Icon icon="solar:add-circle-bold" class="w-5 h-5" />
-        <span>新建分类</span>
-      </button>
+      <div class="flex items-center gap-3">
+        <button
+          @click="handleExport"
+          :disabled="exporting"
+          class="flex items-center justify-center gap-2 px-4 py-2.5 border border-[--border-primary] bg-[--bg-secondary]/50 hover:bg-[--hover-bg] text-[--text-primary] rounded-xl font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+          <Icon v-if="exporting" icon="svg-spinners:ring-resize" class="w-5 h-5" />
+          <Icon v-else icon="solar:download-bold" class="w-5 h-5" />
+          <span>导出</span>
+        </button>
+        <button
+          @click="handleImport"
+          :disabled="importing"
+          class="flex items-center justify-center gap-2 px-4 py-2.5 border border-[--border-primary] bg-[--bg-secondary]/50 hover:bg-[--hover-bg] text-[--text-primary] rounded-xl font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+          <Icon v-if="importing" icon="svg-spinners:ring-resize" class="w-5 h-5" />
+          <Icon v-else icon="solar:upload-bold" class="w-5 h-5" />
+          <span>导入</span>
+        </button>
+        <button
+          @click="handleCreate"
+          class="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 active:scale-95">
+          <Icon icon="solar:add-circle-bold" class="w-5 h-5" />
+          <span>新建分类</span>
+        </button>
+        <input
+          ref="fileInputRef"
+          type="file"
+          accept=".json,application/json"
+          class="hidden"
+          @change="handleFileChange" />
+      </div>
     </div>
 
     <!-- 数据表格区域 -->
@@ -135,6 +159,7 @@ import { Icon } from '@iconify/vue'
 import Sortable from 'sortablejs'
 import { useRouter } from 'vue-router'
 import { CategoryService } from '../services/CategoryService'
+import { DataService } from '../services/DataService'
 import type { CategoryModel } from '../models/category'
 
 const router = useRouter()
@@ -150,6 +175,9 @@ const categories = ref<CategoryModel[]>([])
 const formRef = ref<FormInst | null>(null)
 const tableContainer = ref<HTMLElement | null>(null)
 const sortableInstance = ref<Sortable | null>(null)
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const importing = ref(false)
+const exporting = ref(false)
 
 // 表单数据
 const defaultForm: CategoryModel = {
@@ -262,6 +290,56 @@ const fetchData = async () => {
     message.error(error.message || '获取数据失败')
   } finally {
     loading.value = false
+  }
+}
+
+// 导出数据（JSON）
+const handleExport = async () => {
+  exporting.value = true
+  try {
+    await DataService.downloadData()
+    message.success('导出成功')
+  } catch (error: any) {
+    message.error(error.message || '导出失败')
+  } finally {
+    exporting.value = false
+  }
+}
+
+// 触发文件选择
+const handleImport = () => {
+  fileInputRef.value?.click()
+}
+
+// 处理导入文件（仅支持 JSON）
+const handleFileChange = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  try {
+    // 仅支持 JSON 文件
+    if (!DataService.isValidJsonFile(file)) {
+      message.error('仅支持导入 JSON 文件')
+      return
+    }
+
+    // 校验 JSON 内容是否合法
+    const isValid = await DataService.readAndValidateJsonFile(file)
+    if (!isValid) {
+      message.error('JSON 文件内容格式不正确')
+      return
+    }
+
+    importing.value = true
+    const result = await DataService.uploadData(file)
+    message.success(result.message || '导入成功')
+    fetchData()
+  } catch (error: any) {
+    message.error(error.message || '导入失败')
+  } finally {
+    importing.value = false
+    input.value = ''
   }
 }
 
