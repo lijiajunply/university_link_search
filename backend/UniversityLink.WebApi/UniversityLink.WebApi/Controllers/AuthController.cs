@@ -48,10 +48,11 @@ public class AuthController(IJwtGenerate generate) : ControllerBase
 
             // 从 Claims 中提取信息 (中间件已经在 OnCreatingTicket 中把 JSON 映射为 Claims 了)
             var claims = authenticateResult.Principal.Claims;
-            var enumerable = claims as Claim[] ?? claims.ToArray();
+            var enumerable = claims as Claim[] ?? [.. claims];
             var sub = enumerable.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             var name = enumerable.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             var role = enumerable.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            Console.WriteLine($"OAuth2回调成功: sub={sub}, name={name}, role={role}");
 
             // 获取 AccessToken (需要确保在 Cookie 配置中开启了保存 Token)
             var accessToken = authenticateResult.Properties?.GetTokenValue("access_token");
