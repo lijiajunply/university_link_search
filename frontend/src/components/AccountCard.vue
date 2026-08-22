@@ -31,7 +31,7 @@
 import {AccountCircleRound} from '@vicons/material'
 import {Icon} from '@vicons/utils'
 import {onMounted, ref} from 'vue'
-import { useAuthorizationStore } from '../stores/Authorization.ts'
+import { useAuthorizationStore } from '../stores/Authorization'
 
 const store = useAuthorizationStore()
 const isLogin = ref(store.isAuthenticated);

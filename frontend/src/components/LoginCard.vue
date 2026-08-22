@@ -72,6 +72,7 @@
 import {ref} from 'vue'
 import {NButton, NSwitch, NInput} from "naive-ui";
 import {useAuthorizationStore} from '../stores/Authorization.ts'
+import {url} from "../services/UrlService";
 
 defineProps({
   show: Boolean,
@@ -108,7 +109,7 @@ function closeModal() {
 
 // 处理OAuth授权登录
 const handleOAuthLogin = () => {
-  window.location.href = 'https://link.xauat.site/auth/authorize';
+  window.location.href = `${url}/auth/authorize`;
 }
 </script>
 
