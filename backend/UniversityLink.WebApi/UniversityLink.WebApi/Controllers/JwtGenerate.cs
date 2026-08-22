@@ -22,8 +22,7 @@ public class JwtGenerate : IJwtGenerate
             new Claim(ClaimTypes.Name, userInfo.Name ?? ""),
             new Claim(ClaimTypes.Role, userInfo.Role ?? "User"),
             new Claim("userId", userInfo.Sub ?? ""),
-            new Claim("userName", userInfo.Name ?? ""),
-            new Claim("role", userInfo.Role ?? "User")
+            new Claim("userName", userInfo.Name ?? "")
         };
 
         var token = new JwtSecurityToken(

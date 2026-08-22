@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -26,7 +27,7 @@ public class DataController(IDbContextFactory<LinkContext> dbFactory)
             await using var context = await dbFactory.CreateDbContextAsync(cancellationToken);
 
             // 获取当前用户身份（从JWT token或其他身份验证机制中）
-            var identity = User.FindFirst("role")?.Value ?? "Member";
+            var identity = User.FindFirst(ClaimTypes.Role)?.Value ?? "Member";
 
             if (identity == "Member")
             {
