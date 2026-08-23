@@ -5,15 +5,15 @@
       <div class="flex items-center gap-4">
         <button
           @click="router.back()"
-          class="w-10 h-10 rounded-xl bg-white dark:bg-[#1f1f23] border border-[--border-primary] flex items-center justify-center hover:bg-[--hover-bg] transition-colors shadow-sm">
-          <Icon icon="solar:arrow-left-bold" class="w-5 h-5 text-[--text-secondary]" />
+          class="w-10 h-10 rounded-xl bg-white dark:bg-[#1f1f23] border border-[var(--border-primary)] flex items-center justify-center hover:bg-[var(--hover-bg)] transition-colors shadow-sm">
+          <Icon icon="solar:arrow-left-bold" class="w-5 h-5 text-[var(--text-secondary)]" />
         </button>
         <div>
-          <h1 class="text-2xl sm:text-3xl font-bold text-[--text-primary] tracking-tight flex items-center gap-2">
+          <h1 class="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-2">
             <span>{{ categoryName || '加载中...' }}</span>
-            <span class="text-base font-normal text-[--text-tertiary] bg-[--bg-secondary] px-2 py-0.5 rounded-lg">链接管理</span>
+            <span class="text-base font-normal text-[var(--text-tertiary)] bg-[var(--bg-secondary)] px-2 py-0.5 rounded-lg">链接管理</span>
           </h1>
-          <p class="mt-1 text-sm text-[--text-secondary]">管理该分类下的所有导航链接</p>
+          <p class="mt-1 text-sm text-[var(--text-secondary)]">管理该分类下的所有导航链接</p>
         </div>
       </div>
       <button
@@ -27,7 +27,7 @@
     <!-- 数据表格区域 -->
     <div 
       ref="tableContainer"
-      class="bg-white/80 dark:bg-[#18181c]/80 backdrop-blur-xl rounded-2xl border border-[--border-primary] shadow-sm overflow-hidden">
+      class="bg-white/80 dark:bg-[#18181c]/80 backdrop-blur-xl rounded-2xl border border-[var(--border-primary)] shadow-sm overflow-hidden">
       <n-data-table
         :columns="columns"
         :data="links"
@@ -44,15 +44,15 @@
       v-model:show="showModal"
       :mask-closable="false"
       transform-origin="center">
-      <div class="w-full max-w-lg bg-white dark:bg-[#1f1f23] rounded-2xl shadow-2xl border border-[--border-primary] overflow-hidden">
+      <div class="w-full max-w-lg bg-white dark:bg-[#1f1f23] rounded-2xl shadow-2xl border border-[var(--border-primary)] overflow-hidden">
         <!-- 弹窗标题 -->
-        <div class="px-6 py-4 border-b border-[--border-primary] flex items-center justify-between bg-[--bg-secondary]/50">
-          <h3 class="text-lg font-bold text-[--text-primary]">
+        <div class="px-6 py-4 border-b border-[var(--border-primary)] flex items-center justify-between bg-[var(--bg-secondary)]/50">
+          <h3 class="text-lg font-bold text-[var(--text-primary)]">
             {{ isEdit ? '编辑链接' : '添加链接' }}
           </h3>
           <button 
             @click="showModal = false"
-            class="p-1 rounded-lg hover:bg-[--hover-bg] text-[--text-tertiary] hover:text-[--text-primary] transition-colors">
+            class="p-1 rounded-lg hover:bg-[var(--hover-bg)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors">
             <Icon icon="solar:close-circle-bold" class="w-6 h-6" />
           </button>
         </div>
@@ -69,7 +69,7 @@
             <n-form-item label="链接名称" path="name">
               <n-input v-model:value="formModel.name" placeholder="例如：GitHub" class="custom-input">
                 <template #prefix>
-                  <Icon icon="solar:text-bold" class="text-[--text-tertiary]" />
+                  <Icon icon="solar:text-bold" class="text-[var(--text-tertiary)]" />
                 </template>
               </n-input>
             </n-form-item>
@@ -77,7 +77,7 @@
             <n-form-item label="链接地址 (URL)" path="url">
               <n-input v-model:value="formModel.url" placeholder="https://..." class="custom-input">
                 <template #prefix>
-                  <Icon icon="solar:link-bold" class="text-[--text-tertiary]" />
+                  <Icon icon="solar:link-bold" class="text-[var(--text-tertiary)]" />
                 </template>
               </n-input>
             </n-form-item>
@@ -86,7 +86,7 @@
               <n-form-item label="唯一标识 (Key)" path="key">
                 <n-input v-model:value="formModel.key" placeholder="例如：github" class="custom-input">
                   <template #prefix>
-                    <Icon icon="solar:key-bold" class="text-[--text-tertiary]" />
+                    <Icon icon="solar:key-bold" class="text-[var(--text-tertiary)]" />
                   </template>
                 </n-input>
               </n-form-item>
@@ -101,13 +101,13 @@
                 <div class="flex-1">
                   <n-input v-model:value="formModel.icon" placeholder="图标代码或图片链接" class="custom-input">
                     <template #prefix>
-                      <Icon icon="solar:sticker-smile-circle-2-bold" class="text-[--text-tertiary]" />
+                      <Icon icon="solar:sticker-smile-circle-2-bold" class="text-[var(--text-tertiary)]" />
                     </template>
                   </n-input>
                 </div>
-                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[--bg-secondary] border border-[--border-primary] flex items-center justify-center overflow-hidden">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] flex items-center justify-center overflow-hidden">
                   <img v-if="formModel.icon && (formModel.icon.startsWith('http') || formModel.icon.startsWith('/'))" :src="formModel.icon" class="w-full h-full object-cover" />
-                  <Icon v-else-if="formModel.icon" :icon="formModel.icon" class="w-6 h-6 text-[--text-primary]" />
+                  <Icon v-else-if="formModel.icon" :icon="formModel.icon" class="w-6 h-6 text-[var(--text-primary)]" />
                 </div>
               </div>
             </n-form-item>
@@ -125,10 +125,10 @@
         </div>
 
         <!-- 底部按钮 -->
-        <div class="px-6 py-4 bg-[--bg-secondary]/30 flex justify-end gap-3">
+        <div class="px-6 py-4 bg-[var(--bg-secondary)]/30 flex justify-end gap-3">
           <button
             @click="showModal = false"
-            class="px-4 py-2 rounded-xl text-sm font-medium text-[--text-secondary] hover:bg-[--hover-bg] transition-colors">
+            class="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] transition-colors">
             取消
           </button>
           <button
@@ -203,7 +203,7 @@ const columns: DataTableColumns<LinkModel> = [
     render() {
       return h(Icon, { 
         icon: 'solar:hamburger-menu-linear', 
-        class: 'drag-handle cursor-move w-5 h-5 text-[--text-tertiary] hover:text-[--text-primary] transition-colors' 
+        class: 'drag-handle cursor-move w-5 h-5 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors' 
       })
     }
   },
@@ -214,10 +214,10 @@ const columns: DataTableColumns<LinkModel> = [
     render(row) {
       if (!row.icon) return null
       const isImg = row.icon.startsWith('http') || row.icon.startsWith('/')
-      return h('div', { class: 'w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-[--border-primary] flex items-center justify-center overflow-hidden' }, [
+      return h('div', { class: 'w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-[var(--border-primary)] flex items-center justify-center overflow-hidden' }, [
         isImg 
           ? h('img', { src: row.icon, class: 'w-full h-full object-cover' })
-          : h(Icon, { icon: row.icon, class: 'w-6 h-6 text-[--text-primary]' })
+          : h(Icon, { icon: row.icon, class: 'w-6 h-6 text-[var(--text-primary)]' })
       ])
     }
   },
@@ -229,9 +229,9 @@ const columns: DataTableColumns<LinkModel> = [
         h('a', { 
           href: row.url, 
           target: '_blank',
-          class: 'font-semibold text-[--text-primary] hover:text-blue-500 transition-colors truncate max-w-[200px]' 
+          class: 'font-semibold text-[var(--text-primary)] hover:text-blue-500 transition-colors truncate max-w-[200px]' 
         }, row.name),
-        h('span', { class: 'text-xs text-[--text-tertiary] truncate max-w-[200px]' }, row.url)
+        h('span', { class: 'text-xs text-[var(--text-tertiary)] truncate max-w-[200px]' }, row.url)
       ])
     }
   },
@@ -240,14 +240,14 @@ const columns: DataTableColumns<LinkModel> = [
     key: 'key',
     width: 100,
     render(row) {
-       return h('span', { class: 'text-xs font-mono bg-[--bg-secondary] px-2 py-1 rounded text-[--text-secondary]' }, row.key)
+       return h('span', { class: 'text-xs font-mono bg-[var(--bg-secondary)] px-2 py-1 rounded text-[var(--text-secondary)]' }, row.key)
     }
   },
   {
     title: '描述',
     key: 'description',
     render(row) {
-      return h('span', { class: 'text-[--text-secondary] text-sm line-clamp-1' }, row.description || '-')
+      return h('span', { class: 'text-[var(--text-secondary)] text-sm line-clamp-1' }, row.description || '-')
     }
   },
   {
@@ -255,7 +255,7 @@ const columns: DataTableColumns<LinkModel> = [
     key: 'index',
     width: 80,
     render(row) {
-      return h('div', { class: 'font-mono text-[--text-secondary]' }, row.index)
+      return h('div', { class: 'font-mono text-[var(--text-secondary)]' }, row.index)
     }
   },
   {

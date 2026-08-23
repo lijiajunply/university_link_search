@@ -3,14 +3,14 @@
     <!-- 顶部标题栏 -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl sm:text-3xl font-bold text-[--text-primary] tracking-tight">分类管理</h1>
-        <p class="mt-1 text-sm text-[--text-secondary]">管理网站首页显示的分类及其排序</p>
+        <h1 class="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">分类管理</h1>
+        <p class="mt-1 text-sm text-[var(--text-secondary)]">管理网站首页显示的分类及其排序</p>
       </div>
       <div class="flex items-center gap-3">
         <button
           @click="handleExport"
           :disabled="exporting"
-          class="flex items-center justify-center gap-2 px-4 py-2.5 border border-[--border-primary] bg-[--bg-secondary]/50 hover:bg-[--hover-bg] text-[--text-primary] rounded-xl font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+          class="flex items-center justify-center gap-2 px-4 py-2.5 border border-[var(--border-primary)] bg-[var(--bg-secondary)]/50 hover:bg-[var(--hover-bg)] text-[var(--text-primary)] rounded-xl font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
           <Icon v-if="exporting" icon="svg-spinners:ring-resize" class="w-5 h-5" />
           <Icon v-else icon="solar:download-bold" class="w-5 h-5" />
           <span>导出</span>
@@ -18,7 +18,7 @@
         <button
           @click="handleImport"
           :disabled="importing"
-          class="flex items-center justify-center gap-2 px-4 py-2.5 border border-[--border-primary] bg-[--bg-secondary]/50 hover:bg-[--hover-bg] text-[--text-primary] rounded-xl font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+          class="flex items-center justify-center gap-2 px-4 py-2.5 border border-[var(--border-primary)] bg-[var(--bg-secondary)]/50 hover:bg-[var(--hover-bg)] text-[var(--text-primary)] rounded-xl font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
           <Icon v-if="importing" icon="svg-spinners:ring-resize" class="w-5 h-5" />
           <Icon v-else icon="solar:upload-bold" class="w-5 h-5" />
           <span>导入</span>
@@ -39,7 +39,7 @@
     </div>
 
     <!-- 数据表格区域 -->
-    <div class="bg-white/80 dark:bg-[#18181c]/80 backdrop-blur-xl rounded-2xl border border-[--border-primary] shadow-sm overflow-hidden">
+    <div class="bg-white/80 dark:bg-[#18181c]/80 backdrop-blur-xl rounded-2xl border border-[var(--border-primary)] shadow-sm overflow-hidden">
       <n-data-table
         :columns="columns"
         :data="categories"
@@ -56,15 +56,15 @@
       v-model:show="showModal"
       :mask-closable="false"
       transform-origin="center">
-      <div class="w-full max-w-lg bg-white dark:bg-[#1f1f23] rounded-2xl shadow-2xl border border-[--border-primary] overflow-hidden">
+      <div class="w-full max-w-lg bg-white dark:bg-[#1f1f23] rounded-2xl shadow-2xl border border-[var(--border-primary)] overflow-hidden">
         <!-- 弹窗标题 -->
-        <div class="px-6 py-4 border-b border-[--border-primary] flex items-center justify-between bg-[--bg-secondary]/50">
-          <h3 class="text-lg font-bold text-[--text-primary]">
+        <div class="px-6 py-4 border-b border-[var(--border-primary)] flex items-center justify-between bg-[var(--bg-secondary)]/50">
+          <h3 class="text-lg font-bold text-[var(--text-primary)]">
             {{ isEdit ? '编辑分类' : '新建分类' }}
           </h3>
           <button 
             @click="showModal = false"
-            class="p-1 rounded-lg hover:bg-[--hover-bg] text-[--text-tertiary] hover:text-[--text-primary] transition-colors">
+            class="p-1 rounded-lg hover:bg-[var(--hover-bg)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors">
             <Icon icon="solar:close-circle-bold" class="w-6 h-6" />
           </button>
         </div>
@@ -82,7 +82,7 @@
               <n-form-item label="分类名称" path="name">
                 <n-input v-model:value="formModel.name" placeholder="例如：学习资料" class="custom-input">
                   <template #prefix>
-                    <Icon icon="solar:text-bold" class="text-[--text-tertiary]" />
+                    <Icon icon="solar:text-bold" class="text-[var(--text-tertiary)]" />
                   </template>
                 </n-input>
               </n-form-item>
@@ -90,7 +90,7 @@
               <n-form-item label="唯一标识 (Key)" path="key">
                 <n-input v-model:value="formModel.key" placeholder="例如：study" class="custom-input">
                   <template #prefix>
-                    <Icon icon="solar:key-bold" class="text-[--text-tertiary]" />
+                    <Icon icon="solar:key-bold" class="text-[var(--text-tertiary)]" />
                   </template>
                 </n-input>
               </n-form-item>
@@ -101,12 +101,12 @@
                 <div class="flex-1">
                   <n-input v-model:value="formModel.icon" placeholder="例如：solar:book-bold" class="custom-input">
                     <template #prefix>
-                      <Icon icon="solar:sticker-smile-circle-2-bold" class="text-[--text-tertiary]" />
+                      <Icon icon="solar:sticker-smile-circle-2-bold" class="text-[var(--text-tertiary)]" />
                     </template>
                   </n-input>
                 </div>
-                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[--bg-secondary] border border-[--border-primary] flex items-center justify-center">
-                  <Icon v-if="formModel.icon" :icon="formModel.icon" class="w-6 h-6 text-[--text-primary]" />
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] flex items-center justify-center">
+                  <Icon v-if="formModel.icon" :icon="formModel.icon" class="w-6 h-6 text-[var(--text-primary)]" />
                 </div>
               </div>
             </n-form-item>
@@ -128,10 +128,10 @@
         </div>
 
         <!-- 底部按钮 -->
-        <div class="px-6 py-4 bg-[--bg-secondary]/30 flex justify-end gap-3">
+        <div class="px-6 py-4 bg-[var(--bg-secondary)]/30 flex justify-end gap-3">
           <button
             @click="showModal = false"
-            class="px-4 py-2 rounded-xl text-sm font-medium text-[--text-secondary] hover:bg-[--hover-bg] transition-colors">
+            class="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--hover-bg)] transition-colors">
             取消
           </button>
           <button
@@ -205,7 +205,7 @@ const columns: DataTableColumns<CategoryModel> = [
     render() {
       return h(Icon, { 
         icon: 'solar:hamburger-menu-linear', 
-        class: 'drag-handle cursor-move w-5 h-5 text-[--text-tertiary] hover:text-[--text-primary] transition-colors' 
+        class: 'drag-handle cursor-move w-5 h-5 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors' 
       })
     }
   },
@@ -224,8 +224,8 @@ const columns: DataTableColumns<CategoryModel> = [
     key: 'name',
     render(row) {
       return h('div', { class: 'flex flex-col' }, [
-        h('span', { class: 'font-semibold text-[--text-primary]' }, row.name),
-        h('span', { class: 'text-xs text-[--text-tertiary]' }, row.key)
+        h('span', { class: 'font-semibold text-[var(--text-primary)]' }, row.name),
+        h('span', { class: 'text-xs text-[var(--text-tertiary)]' }, row.key)
       ])
     }
   },
@@ -233,7 +233,7 @@ const columns: DataTableColumns<CategoryModel> = [
     title: '描述',
     key: 'description',
     render(row) {
-      return h('span', { class: 'text-[--text-secondary] text-sm' }, row.description || '-')
+      return h('span', { class: 'text-[var(--text-secondary)] text-sm' }, row.description || '-')
     }
   },
   {
@@ -241,7 +241,7 @@ const columns: DataTableColumns<CategoryModel> = [
     key: 'index',
     width: 80,
     render(row) {
-      return h('div', { class: 'font-mono text-[--text-secondary]' }, row.index)
+      return h('div', { class: 'font-mono text-[var(--text-secondary)]' }, row.index)
     }
   },
   {

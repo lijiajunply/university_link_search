@@ -79,6 +79,25 @@
     }
 }
 
+/* 管理后台（adminPages）主题变量：Category / Categories 等页面使用 */
+:root {
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-tertiary: #9ca3af;
+    --bg-secondary: #f3f4f6;
+    --hover-bg: #f3f4f6;
+    --border-primary: #e5e7eb;
+}
+
+.dark {
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-tertiary: #9ca3af;
+    --bg-secondary: #1f1f23;
+    --hover-bg: #262626;
+    --border-primary: #374151;
+}
+
 ::-webkit-scrollbar {
     display: none;
 }
