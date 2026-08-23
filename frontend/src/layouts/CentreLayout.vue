@@ -9,11 +9,9 @@
         <div class="flex items-center justify-between h-14 sm:h-16">
           <!-- Logo 区域 -->
           <router-link to="/" class="flex items-center gap-3 group relative z-10">
-            <div class="w-9 h-9 rounded-xl bg-linear-to-br from-[#007AFF] to-[#0055FF] flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 group-active:scale-95 transition-all duration-300">
-              <Icon icon="solar:home-smile-bold" class="w-5 h-5 text-white" />
-            </div>
-            <span class="text-lg font-semibold tracking-tight text-gray-900 dark:text-white hidden xs:block">
-              建大导航
+            <img src="/logo.png" alt="Logo" class="w-5 h-5 object-cover" />
+            <span class="text-lg font-semibold tracking-tight hidden xl:block">
+              建大导航 - 后台
             </span>
           </router-link>
 

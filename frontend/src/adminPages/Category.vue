@@ -82,20 +82,6 @@
               </n-input>
             </n-form-item>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <n-form-item label="唯一标识 (Key)" path="key">
-                <n-input v-model:value="formModel.key" placeholder="例如：github" class="custom-input">
-                  <template #prefix>
-                    <Icon icon="solar:key-bold" class="text-[var(--text-tertiary)]" />
-                  </template>
-                </n-input>
-              </n-form-item>
-
-              <n-form-item label="排序索引" path="index">
-                <n-input-number v-model:value="formModel.index" class="w-full custom-input" button-placement="both" />
-              </n-form-item>
-            </div>
-
             <n-form-item label="图标 (iconfont / URL)" path="icon">
               <div class="flex gap-3 w-full">
                 <div class="flex-1">
@@ -148,7 +134,7 @@
 <script setup lang="ts">
 import { h, onMounted, ref, reactive, nextTick, watch } from 'vue'
 import { 
-  NDataTable, NModal, NForm, NFormItem, NInput, NInputNumber, 
+  NDataTable, NModal, NForm, NFormItem, NInput,
   useMessage, useDialog, type DataTableColumns, type FormInst
 } from 'naive-ui'
 import { Icon } from '@iconify/vue'
@@ -191,8 +177,7 @@ const formModel = reactive<LinkModel>({ ...defaultForm })
 // 表单校验规则
 const rules = {
   name: { required: true, message: '请输入链接名称', trigger: 'blur' },
-  url: { required: true, message: '请输入链接地址', trigger: 'blur' },
-  key: { required: true, message: '请输入唯一标识', trigger: 'blur' }
+  url: { required: true, message: '请输入链接地址', trigger: 'blur' }
 }
 
 // 表格列定义
@@ -302,9 +287,6 @@ const fetchData = async () => {
 const handleCreate = () => {
   isEdit.value = false
   Object.assign(formModel, defaultForm)
-  if (links.value.length > 0) {
-    formModel.index = Math.max(...links.value.map(l => l.index)) + 1
-  }
   showModal.value = true
 }
 

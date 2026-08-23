@@ -50,6 +50,12 @@ public class CategoryRepository(LinkContext context) : ICategoryRepository
     // 创建分类
     public async Task<CategoryModel> CreateAsync(CategoryModel category, CancellationToken cancellationToken = default)
     {
+        // 生成唯一Key（如果未提供）
+        if (string.IsNullOrEmpty(category.Key))
+        {
+            category.Key = GenerateUniqueKey(category.Name);
+        }
+
         // 设置排序值为当前最大排序值+1
         var maxSort = await context.Categories.MaxAsync(c => (int?)c.Index, cancellationToken) ?? 0;
         category.Index = maxSort + 1;
@@ -58,6 +64,37 @@ public class CategoryRepository(LinkContext context) : ICategoryRepository
         await context.SaveChangesAsync(cancellationToken);
 
         return category;
+    }
+
+    /// <summary>
+    /// 生成唯一Key
+    /// </summary>
+    private string GenerateUniqueKey(string name)
+    {
+        // 转换为小写并替换空格为连字符
+        var key = name.ToLower()
+            .Replace(" ", "-")
+            .Replace("_", "-")
+            .Replace("--", "-");
+
+        // 移除特殊字符
+        key = System.Text.RegularExpressions.Regex.Replace(key, "[^a-z0-9-]", "");
+
+        // 名称无法生成有效 key（例如纯中文）时，回退到短随机串
+        if (string.IsNullOrEmpty(key))
+        {
+            key = System.Guid.NewGuid().ToString("N")[..12];
+        }
+
+        // 确保Key唯一
+        var counter = 1;
+        var originalKey = key;
+        while (context.Categories.Any(c => c.Key == key))
+        {
+            key = $"{originalKey}-{counter++}";
+        }
+
+        return key;
     }
 
     // 更新分类

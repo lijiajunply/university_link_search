@@ -39,6 +39,12 @@ public class LinkRepository(LinkContext context) : ILinkRepository
         {
             link.Key = GenerateUniqueKey(link.Name);
         }
+
+        // 设置排序值为当前分类下最大排序值+1
+        var maxSort = await context.Links
+            .Where(l => l.CategoryKey == link.CategoryKey)
+            .MaxAsync(l => (int?)l.Index, cancellationToken) ?? 0;
+        link.Index = maxSort + 1;
         
         await context.Links.AddAsync(link, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -121,6 +127,12 @@ public class LinkRepository(LinkContext context) : ILinkRepository
         
         // 移除特殊字符
         key = System.Text.RegularExpressions.Regex.Replace(key, "[^a-z0-9-]", "");
+
+        // 名称无法生成有效 key（例如纯中文）时，回退到短随机串
+        if (string.IsNullOrEmpty(key))
+        {
+            key = System.Guid.NewGuid().ToString("N")[..12];
+        }
         
         // 确保Key唯一
         var counter = 1;

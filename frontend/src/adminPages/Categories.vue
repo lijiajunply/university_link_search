@@ -80,23 +80,13 @@
             label-placement="top"
             require-mark-placement="right-hanging">
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <n-form-item label="分类名称" path="name">
-                <n-input v-model:value="formModel.name" placeholder="例如：学习资料" class="custom-input">
-                  <template #prefix>
-                    <Icon icon="solar:text-bold" class="text-[var(--text-tertiary)]" />
-                  </template>
-                </n-input>
-              </n-form-item>
-
-              <n-form-item label="唯一标识 (Key)" path="key">
-                <n-input v-model:value="formModel.key" placeholder="例如：study" class="custom-input">
-                  <template #prefix>
-                    <Icon icon="solar:key-bold" class="text-[var(--text-tertiary)]" />
-                  </template>
-                </n-input>
-              </n-form-item>
-            </div>
+            <n-form-item label="分类名称" path="name">
+              <n-input v-model:value="formModel.name" placeholder="例如：学习资料" class="custom-input">
+                <template #prefix>
+                  <Icon icon="solar:text-bold" class="text-[var(--text-tertiary)]" />
+                </template>
+              </n-input>
+            </n-form-item>
 
             <n-form-item label="图标 (iconfont / URL)" path="icon">
               <div class="flex gap-3 w-full">
@@ -111,10 +101,6 @@
                   <AppLogo v-if="formModel.icon" :icon="formModel.icon" :name="formModel.name" url="" :size="24" />
                 </div>
               </div>
-            </n-form-item>
-
-            <n-form-item label="排序索引" path="index">
-              <n-input-number v-model:value="formModel.index" class="w-full custom-input" button-placement="both" />
             </n-form-item>
 
             <n-form-item label="描述" path="description">
@@ -154,7 +140,7 @@
 <script setup lang="ts">
 import { h, onMounted, ref, reactive, nextTick, watch } from 'vue'
 import { 
-  NDataTable, NModal, NForm, NFormItem, NInput, NInputNumber, 
+  NDataTable, NModal, NForm, NFormItem, NInput,
   useMessage, useDialog, type DataTableColumns, type FormInst
 } from 'naive-ui'
 import { Icon } from '@iconify/vue'
@@ -196,7 +182,6 @@ const formModel = reactive<CategoryModel>({ ...defaultForm })
 // 表单校验规则
 const rules = {
   name: { required: true, message: '请输入分类名称', trigger: 'blur' },
-  key: { required: true, message: '请输入唯一标识', trigger: 'blur' },
   icon: { required: true, message: '请输入图标代码', trigger: 'blur' }
 }
 
@@ -350,10 +335,6 @@ const handleFileChange = async (event: Event) => {
 const handleCreate = () => {
   isEdit.value = false
   Object.assign(formModel, defaultForm)
-  // 自动设置一个排序索引
-  if (categories.value.length > 0) {
-    formModel.index = Math.max(...categories.value.map(c => c.index)) + 1
-  }
   showModal.value = true
 }
 
