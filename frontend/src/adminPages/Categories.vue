@@ -3,8 +3,8 @@
     <!-- 顶部标题栏 -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">分类管理</h1>
-        <p class="mt-1 text-sm text-[var(--text-secondary)]">管理网站首页显示的分类及其排序</p>
+        <h1 class="text-2xl sm:text-3xl font-bold text-(--text-primary) tracking-tight">分类管理</h1>
+        <p class="mt-1 text-sm text-(--text-secondary)">管理网站首页显示的分类及其排序</p>
       </div>
       <div class="flex items-center gap-3">
         <button
@@ -39,7 +39,9 @@
     </div>
 
     <!-- 数据表格区域 -->
-    <div class="bg-white/80 dark:bg-[#18181c]/80 backdrop-blur-xl rounded-2xl border border-[var(--border-primary)] shadow-sm overflow-hidden">
+    <div
+      ref="tableContainer"
+      class="bg-white/80 dark:bg-[#18181c]/80 backdrop-blur-xl rounded-2xl border border-[var(--border-primary)] shadow-sm overflow-hidden">
       <n-data-table
         :columns="columns"
         :data="categories"
@@ -161,6 +163,7 @@ import { useRouter } from 'vue-router'
 import { CategoryService } from '../services/CategoryService'
 import { DataService } from '../services/DataService'
 import type { CategoryModel } from '../models/category'
+import AppLogo from '../components/AppLogo.vue'
 
 const router = useRouter()
 const message = useMessage()
@@ -215,7 +218,7 @@ const columns: DataTableColumns<CategoryModel> = [
     width: 80,
     render(row) {
       return h('div', { class: 'w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center' }, [
-        h(Icon, { icon: row.icon, class: 'w-6 h-6 text-blue-500' })
+        h(AppLogo, { icon: row.icon, name: row.name, url: '', class: 'w-6 h-6 text-blue-500' })
       ])
     }
   },

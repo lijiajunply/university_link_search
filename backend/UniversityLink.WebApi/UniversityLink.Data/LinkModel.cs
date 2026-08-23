@@ -16,6 +16,10 @@ public class LinkModel : DataModel
     [Column(TypeName = "varchar(64)")] public string Url { get; set; } = "";
     [Column(TypeName = "varchar(32)")] public string? Description { get; set; } = "";
     public int Index { get; set; }
+
+    // 所属分类的 Key，映射到已有的 CategoryModelKey 外键列
+    [Column("CategoryModelKey", TypeName = "varchar(32)")]
+    public string? CategoryKey { get; set; }
 }
 
 [Index(nameof(Index))]

@@ -11,6 +11,17 @@ public sealed class LinkContext(DbContextOptions<LinkContext> options) : DbConte
     public DbSet<LinkModel> Links { get; init; }
     public DbSet<CategoryModel> Categories { get; init; }
     public DbSet<UserModel> Users { get; init; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // 链接通过 CategoryKey 关联到分类，复用已有的 CategoryModelKey 列
+        modelBuilder.Entity<LinkModel>()
+            .HasOne<CategoryModel>()
+            .WithMany(c => c.Links)
+            .HasForeignKey(l => l.CategoryKey);
+    }
 }
 
 [Serializable]

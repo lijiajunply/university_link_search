@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import IconFont from '../IconFont.vue';
-import { getIcon, checkIsWeiXin } from '../../utils/urlHelper';
+import { checkIsWeiXin } from '../../utils/urlHelper';
+import AppLogo from '../AppLogo.vue';
 
 interface Link {
   url: string;
@@ -41,25 +41,7 @@ const handleClick = (e: MouseEvent) => {
       @click="handleClick"
   >
     <div class="flex flex-col justify-center items-center">
-      <template v-if="link.icon">
-        <img
-            v-if="link.icon.startsWith('http')"
-            v-lazy="link.icon"
-            :alt="link.name"
-            class="h-10 w-10 rounded"
-        />
-        <IconFont
-            v-else
-            :type="`#icon-${link.icon}`"
-            class="text-[40px]"
-        />
-      </template>
-      <img
-          v-else
-          v-lazy="getIcon(link.url)"
-          :alt="link.name"
-          class="h-10 w-10 rounded"
-      />
+      <AppLogo :url="link.url" :name="link.name" :icon="link.icon" />
       <div class="btn-description text-black/97 dark:text-white/65">{{ link.name }}</div>
     </div>
   </a>

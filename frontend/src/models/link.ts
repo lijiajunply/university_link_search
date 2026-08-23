@@ -6,4 +6,5 @@ export interface LinkModel {
   url: string;
   description?: string;
   index: number;
+  categoryKey?: string;
 }

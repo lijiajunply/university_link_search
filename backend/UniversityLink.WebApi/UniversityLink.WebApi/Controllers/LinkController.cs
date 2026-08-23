@@ -87,7 +87,7 @@ public class LinkController(ILinkService linkService) : ControllerBase
     }
 
     // POST: api/link
-    [HttpPost("create")]
+    [HttpPost]
     [Authorize(Policy = "Admin")]
     public async Task<ActionResult<LinkModel>> CreateLink([FromBody] LinkModel link,
         CancellationToken cancellationToken = default)
@@ -95,8 +95,8 @@ public class LinkController(ILinkService linkService) : ControllerBase
         try
         {
             var createdLink = await linkService.CreateLinkAsync(link, cancellationToken);
-            // LinkModel没有Id属性，使用Key属性替代
-            return CreatedAtAction(nameof(GetLinkById), new { id = 0 }, createdLink);
+            // LinkModel使用Key作为唯一标识
+            return CreatedAtAction(nameof(GetLinkById), new { id = createdLink.Key }, createdLink);
         }
         catch (ArgumentException ex)
         {

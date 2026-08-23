@@ -347,10 +347,10 @@ const handleSubmit = (e: MouseEvent) => {
     if (!errors) {
       submitting.value = true
       try {
-        // 构造 payload，注入 categoryId
+        // 构造 payload，注入 categoryKey（后端 LinkModel.CategoryKey 用于关联分类）
         const payload = {
           ...formModel,
-          categoryId: categoryId // 显式传递 categoryId，即使 TS 接口没定义
+          categoryKey: categoryId
         }
 
         if (isEdit.value) {

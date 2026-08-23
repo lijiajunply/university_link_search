@@ -25,12 +25,10 @@ public class LinkRepository(LinkContext context) : ILinkRepository
     // 根据分类获取链接
     public async Task<IEnumerable<LinkModel>> GetByCategoryAsync(string categoryKey, CancellationToken cancellationToken = default)
     {
-        // 通过分类查找其下的所有链接
-        var category = await context.Categories
-            .Include(c => c.Links)
-            .FirstOrDefaultAsync(c => c.Key == categoryKey, cancellationToken);
-        
-        return category?.Links.OrderBy(l => l.Index).ToList() ?? [];
+        return await context.Links
+            .Where(l => l.CategoryKey == categoryKey)
+            .OrderBy(l => l.Index)
+            .ToListAsync(cancellationToken);
     }
     
     // 创建链接

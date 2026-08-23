@@ -62,6 +62,17 @@ public class LinkService(IUnitOfWork unitOfWork) : ILinkService
             throw new ArgumentException("URL格式不正确");
         }
 
+        // 验证所属分类
+        if (string.IsNullOrWhiteSpace(link.CategoryKey))
+        {
+            throw new ArgumentException("链接所属分类不能为空");
+        }
+
+        if (!await unitOfWork.Categories.ExistsAsync(link.CategoryKey, cancellationToken))
+        {
+            throw new KeyNotFoundException($"分类Key '{link.CategoryKey}' 不存在");
+        }
+
         // 设置默认值
         if (string.IsNullOrEmpty(link.Icon))
         {
@@ -98,6 +109,17 @@ public class LinkService(IUnitOfWork unitOfWork) : ILinkService
         if (!Uri.IsWellFormedUriString(link.Url, UriKind.Absolute))
         {
             throw new ArgumentException("URL格式不正确");
+        }
+
+        // 验证所属分类
+        if (string.IsNullOrWhiteSpace(link.CategoryKey))
+        {
+            throw new ArgumentException("链接所属分类不能为空");
+        }
+
+        if (!await unitOfWork.Categories.ExistsAsync(link.CategoryKey, cancellationToken))
+        {
+            throw new KeyNotFoundException($"分类Key '{link.CategoryKey}' 不存在");
         }
 
         // 更新链接
