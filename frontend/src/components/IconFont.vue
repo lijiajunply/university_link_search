@@ -1,5 +1,5 @@
 <template>
-  <div :class="style">
+  <div :class="style" :style="size ? `font-size:${size}px` : undefined">
     <svg class="icon" aria-hidden="true">
       <use :href="type"></use>
     </svg>
@@ -12,6 +12,7 @@ defineProps({
     type: String,
     required: true
   },
-  style: String
+  style: String,
+  size: Number
 })
 </script>

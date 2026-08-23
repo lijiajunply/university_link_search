@@ -98,17 +98,17 @@
               </n-form-item>
             </div>
 
-            <n-form-item label="图标 (Iconify)" path="icon">
+            <n-form-item label="图标 (iconfont / URL)" path="icon">
               <div class="flex gap-3 w-full">
                 <div class="flex-1">
-                  <n-input v-model:value="formModel.icon" placeholder="例如：solar:book-bold" class="custom-input">
+                  <n-input v-model:value="formModel.icon" placeholder="iconfont 类名或图片链接，例如：book" class="custom-input">
                     <template #prefix>
                       <Icon icon="solar:sticker-smile-circle-2-bold" class="text-[var(--text-tertiary)]" />
                     </template>
                   </n-input>
                 </div>
-                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] flex items-center justify-center">
-                  <Icon v-if="formModel.icon" :icon="formModel.icon" class="w-6 h-6 text-[var(--text-primary)]" />
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] flex items-center justify-center overflow-hidden text-(--text-primary)">
+                  <AppLogo v-if="formModel.icon" :icon="formModel.icon" :name="formModel.name" url="" :size="24" />
                 </div>
               </div>
             </n-form-item>
@@ -217,8 +217,8 @@ const columns: DataTableColumns<CategoryModel> = [
     key: 'icon',
     width: 80,
     render(row) {
-      return h('div', { class: 'w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center' }, [
-        h(AppLogo, { icon: row.icon, name: row.name, url: '', class: 'w-6 h-6 text-blue-500' })
+      return h('div', { class: 'w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500' }, [
+        h(AppLogo, { icon: row.icon, name: row.name, url: '', size: 24 })
       ])
     }
   },

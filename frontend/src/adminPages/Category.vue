@@ -96,18 +96,17 @@
               </n-form-item>
             </div>
 
-            <n-form-item label="图标 (Iconify / URL)" path="icon">
+            <n-form-item label="图标 (iconfont / URL)" path="icon">
               <div class="flex gap-3 w-full">
                 <div class="flex-1">
-                  <n-input v-model:value="formModel.icon" placeholder="图标代码或图片链接" class="custom-input">
+                  <n-input v-model:value="formModel.icon" placeholder="iconfont 类名或图片链接，例如：github" class="custom-input">
                     <template #prefix>
                       <Icon icon="solar:sticker-smile-circle-2-bold" class="text-[var(--text-tertiary)]" />
                     </template>
                   </n-input>
                 </div>
-                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] flex items-center justify-center overflow-hidden">
-                  <img v-if="formModel.icon && (formModel.icon.startsWith('http') || formModel.icon.startsWith('/'))" :src="formModel.icon" class="w-full h-full object-cover" />
-                  <Icon v-else-if="formModel.icon" :icon="formModel.icon" class="w-6 h-6 text-[var(--text-primary)]" />
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] flex items-center justify-center overflow-hidden text-(--text-primary)">
+                  <AppLogo v-if="formModel.icon" :icon="formModel.icon || ''" :name="formModel.name" :url="formModel.url" :size="24" />
                 </div>
               </div>
             </n-form-item>
@@ -158,6 +157,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { LinkService } from '../services/LinkService'
 import { CategoryService } from '../services/CategoryService'
 import type { LinkModel } from '../models/link'
+import AppLogo from '../components/AppLogo.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -213,11 +213,8 @@ const columns: DataTableColumns<LinkModel> = [
     width: 60,
     render(row) {
       if (!row.icon) return null
-      const isImg = row.icon.startsWith('http') || row.icon.startsWith('/')
-      return h('div', { class: 'w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-[var(--border-primary)] flex items-center justify-center overflow-hidden' }, [
-        isImg 
-          ? h('img', { src: row.icon, class: 'w-full h-full object-cover' })
-          : h(Icon, { icon: row.icon, class: 'w-6 h-6 text-[var(--text-primary)]' })
+      return h('div', { class: 'w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-[var(--border-primary)] flex items-center justify-center overflow-hidden text-(--text-primary)' }, [
+        h(AppLogo, { icon: row.icon, name: row.name, url: row.url, size: 24 })
       ])
     }
   },
